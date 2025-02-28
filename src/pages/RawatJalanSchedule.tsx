@@ -1,6 +1,47 @@
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import { variables } from "../constants/variable";
+import axios from "axios";
+
+interface RawatJalan {
+  id_rawat_jalan: string,
+  id_patient: string;
+  id_doctor: string;
+  visit_date: string;
+  status_rawat_jalan: string;
+  verifikasi_status: string;
+  doctor_name: string;
+  patient_name: string;
+  queue_no: number;
+  queue_status: string;
+  id_queue: number;
+}
 
 const RawatJalanSchedule = () => {
+
+  const [outpatients, setOutpatients] = useState<RawatJalan[]>([]);
+  const [status, setStatus] = useState("pending");
+
+  const token = localStorage.getItem("token")
+  useEffect(() => {
+    const fetchOutpatients = async () => {
+      const url = `${variables.BASE_URL}/outpatients?status=${status}`;
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setOutpatients(res.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchOutpatients();
+  }, [status, token]);
+  
+
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar />
@@ -12,7 +53,7 @@ const RawatJalanSchedule = () => {
             width="12"
             height="12"
             fill="currentColor"
-            class="bi bi-chevron-right"
+            className="bi bi-chevron-right"
             viewBox="0 0 16 16"
           >
             <path
@@ -41,7 +82,7 @@ const RawatJalanSchedule = () => {
 
           <button
             type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full w-[15%] px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[15%] px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             + Registrasi
           </button>
@@ -75,7 +116,7 @@ const RawatJalanSchedule = () => {
               width="16"
               height="16"
               fill="currentColor"
-              class="absolute top-3 right-5 bi bi-search"
+              className="absolute top-3 right-5 bi bi-search"
               viewBox="0 0 16 16"
             >
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
@@ -84,12 +125,17 @@ const RawatJalanSchedule = () => {
         </div>
 
         <ul className="flex gap-8 mt-8 mb-[-0.7rem] ml-5 font-semibold">
-          <li className="text-[#478CCF] relative">
+          <button
+          onClick={() => setStatus("accepted")}
+          >Disetujui</button>
+          <button onClick={() => setStatus("pending")} className="text-[#478CCF] relative">
             Menunggu Konfirmasi
             <div className="absolute left-0 top-[2.1rem] w-full border-t-2 border-[#478CCF]"></div>
-          </li>
+          </button>
 
-          <li>Dibatalkan</li>
+          <button
+          onClick={() => setStatus("rejected")}
+          >Dibatalkan</button>
           <li></li>
           <li></li>
         </ul>
@@ -118,46 +164,100 @@ const RawatJalanSchedule = () => {
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
               >
                 DOKTER
               </th>
               <th
                 scope="col"
-                className="px-9 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                className="px-9 py-3 text-center text-xs font-medium text-gray-500 uppercase"
               >
                 STATUS
               </th>
+              <th
+                scope="col"
+                className="px-9 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+              >
+                Action
+              </th>
             </tr>
           </thead>
+            
+
           <tbody className="divide-y divide-gray-200">
+          {outpatients.map((val) => (
             <tr>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                 <h1 className="font-semibold">30 Mei 2023</h1>
                 <p className="font-normal">16:00-22:00</p>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                30 (21:00)
+                {val.queue_no} (21:00)
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                <h1 className="font-semibold">Ary Putra</h1>
+                <h1 className="font-semibold" id={val.id_patient}>{val.patient_name}</h1>
                 <p className="font-normal">NRMF002009</p>
                 <p className="font-normal">Reguler</p>
               </td>
               <td className="px-6 py-4 w-5 whitespace-nowrap text-end text-sm font-medium">
-                <p>dr. Ngurah Baskara</p>
+                <p id={val.id_doctor}>dr. {val.doctor_name}</p>
               </td>
               <td className="px-9 py-3 w-5 whitespace-nowrap text-sm font-semibold">
-                <p className="bg-blue-100 px-2 py-1 text-md text-center text-[#478CCF]">
-                  Active
+                <p className="ml-7 bg-yellow-300 py-1 text-md text-center text-[#000] w-1/2">
+                  {val.verifikasi_status?.toLowerCase()}
                 </p>
                 <p className="font-normal">30 Mei 2024, 10:32</p>
               </td>
-            </tr>
-            <tr className="">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                
+              <td className="flex justify-center text-center gap-3 h-full py-8">
+                <button>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="12" r="12" fill="#4CAF50" />
+                    <path
+                      d="M9 12.5L11.5 15L15.5 9"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                <button>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="12" r="12" fill="#F44336" />
+                    <path
+                      d="M15 9L9 15"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M9 9L15 15"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
               </td>
+            </tr>
+                                  ))}
+            <tr className="">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"></td>
               <td></td>
               <td></td>
               <td></td>
@@ -169,7 +269,7 @@ const RawatJalanSchedule = () => {
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-chevron-left"
+                  className="bi bi-chevron-left"
                   viewBox="0 0 16 16"
                 >
                   <path
@@ -182,7 +282,7 @@ const RawatJalanSchedule = () => {
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-chevron-right"
+                  className="bi bi-chevron-right"
                   viewBox="0 0 16 16"
                 >
                   <path

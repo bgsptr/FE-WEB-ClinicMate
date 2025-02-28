@@ -1,9 +1,50 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import axios from "axios";
+import { variables } from "../constants/variable";
+import Cookies from "js-cookie";
 
-const PatientRegister = () => {
+export interface Patient {
+  id_patient: string;
+  name: string;
+  birth_date: string;
+  gender: string;
+  address: string;
+  phone_number: string;
+}
+
+
+const PatientList = () => {
+  const token = localStorage.getItem('token');
+  const [patients, setPatients] = useState<Patient[]>([]);
+  useEffect(() => {
+    console.log("token", token);
+  }, [token]);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      const url = `${variables.BASE_URL}/patients`
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+          withCredentials: true
+        });
+
+        const patientsData = res.data;
+        setPatients(patientsData);
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    }
+    
+    fetchPatients();
+  }, [])
+
   return (
-    <h1 className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full">
       <div className="w-[16%]">
         <Sidebar />
       </div>
@@ -104,79 +145,45 @@ const PatientRegister = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-800">
-                          Ngurah Aryawan
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                          NRM020089
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                          19 Februari 2002
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-start text-sm font-normal">
-                          <button
-                            type="button"
-                            className="inline-flex items-center gap-x-2 text-sm rounded-lg border border-transparent hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                          >
-                            Regular
-                          </button>
-                        </td>
-                        <td className="px-6 py-3 w-5 whitespace-nowrap text-sm font-semibold">
-                          <p className="bg-blue-100 px-2 py-1 text-md text-center text-[#478CCF]">
-                            Active
-                          </p>
-                        </td>
-                        <td className="px-6 py-3 w-5 whitespace-nowrap text-sm font-semibold">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-three-dots"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                          </svg>
-                        </td>
-                      </tr>
-                      <tr className="">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 flex items-center gap-2">
-                          <p>1-1 dari 1</p>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-chevron-left"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"
-                            />
-                          </svg>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-chevron-right"
-                            viewBox="0 0 16 16"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
-                            />
-                          </svg>
-                        </td>
-                      </tr>
-                    </tbody>
+  {patients?.map((patient) => (
+    <tr key={patient.id_patient}>
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-normal text-gray-800">
+        {patient.name}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+        {patient.id_patient}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+        {new Date(patient.birth_date).toLocaleDateString("id-ID")}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-start text-sm font-normal">
+        <button
+          type="button"
+          className="inline-flex items-center gap-x-2 text-sm rounded-lg border border-transparent hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          { "Regular" }
+        </button>
+      </td>
+      <td className="px-6 py-3 w-5 whitespace-nowrap text-sm font-semibold">
+        <p className={`px-2 py-1 text-md text-center ${patient ? "bg-blue-100 text-[#478CCF]" : "bg-gray-100 text-gray-500"}`}>
+          {"Active"}
+        </p>
+      </td>
+      <td className="px-6 py-3 w-5 whitespace-nowrap text-sm font-semibold">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          className="bi bi-three-dots"
+          viewBox="0 0 16 16"
+        >
+          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+        </svg>
+      </td>
+    </tr>
+  ))}
+</tbody>
                   </table>
                 </div>
               </div>
@@ -185,8 +192,8 @@ const PatientRegister = () => {
           {/* tabel pasien */}
         </div>
       </div>
-    </h1>
+    </div>
   );
 };
 
-export default PatientRegister;
+export default PatientList;

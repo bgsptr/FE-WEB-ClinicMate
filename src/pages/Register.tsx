@@ -1,4 +1,43 @@
+import { ChangeEvent, FormEvent, useState } from "react";
+import { variables } from "../constants/variable";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 const Register = () => {
+  const [register, setRegister] = useState({
+    email: "",
+    password: ""
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setRegister({
+      ...register,
+      [e.target.id]: e.target.value
+    })
+  }
+
+  const navigate = useNavigate();
+
+  const url = `${variables.BASE_URL}/users/register`;
+
+  const changedRegisterData = async (e: FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await axios.post(url, JSON.stringify(register), {
+        headers: {
+          'Content-Type': "application/json"
+        }
+      });
+
+      navigate('/login');
+    } catch (error) {
+      
+    }
+  }
+
+  
+
   return (
     <div className="flex w-full min-h-screen bg-[#f6f6f6]">
       <img src="/left-login.png" className="w-1/2 mr-6" />
@@ -20,6 +59,8 @@ const Register = () => {
             <input
               type="email"
               id="email"
+              onChange={handleChange}
+              value={register.email}
               className="mb-6 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Masukkan Email"
               required
@@ -52,6 +93,8 @@ const Register = () => {
             <input
               type="password"
               id="password"
+              onChange={handleChange}
+              value={register.password}
               className="mb-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Masukkan Password"
               required
@@ -81,9 +124,10 @@ const Register = () => {
 
             <button
               type="submit"
+              onClick={changedRegisterData}
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              Log In
+              Sign Up
             </button>
 
             <h3 className="text-center mt-3">

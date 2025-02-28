@@ -1,9 +1,31 @@
-import React, { useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import axios from "axios";
+import { variables } from "../constants/variable";
+import Cookies from "js-cookie";
+
+interface PatientRegister {
+  full_name: string;
+  birth_place: string;
+  birth_date: string;
+  gender: string;
+  domicile: string;
+}
 
 const PatientRegister = () => {
+  const token = localStorage.getItem("token");
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState(null);
+  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+  const [patientData, setPatientData] = useState<PatientRegister>({
+    full_name: "",
+    birth_place: "",
+    birth_date: "",
+    gender: "",
+    domicile: "",
+  });
+
+  const [email, setEmail] = useState("");
 
   // Toggle the sidebar open/close
   const handleSidebarToggle = () => {
@@ -11,9 +33,70 @@ const PatientRegister = () => {
   };
 
   // Toggle accordion items
-  const handleAccordionToggle = (index) => {
+  const handleAccordionToggle = (index: number) => {
     setOpenAccordion((prevIndex) => (prevIndex === index ? null : index));
   };
+
+  // Handle input change
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setPatientData({
+      ...patientData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const submitUpdateData = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const url = `${variables.BASE_URL}/patients`;
+
+    try {
+      await axios.post(url, JSON.stringify(patientData), {
+        headers: {
+          'Content-Type': "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
+        withCredentials: true
+      });
+
+      // navigate('/login');
+      setPatientData({
+        full_name: "",
+        birth_place: "",
+        birth_date: "",
+        gender: "",
+        domicile: "",
+      });
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(() => {
+    console.log(patientData)
+  }, [patientData])
+
+  useEffect(() => {
+    const fetchEmail = async () => {
+      const url = `${variables.BASE_URL}/users/me`;
+
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // console.log(res.data);
+        setEmail(res.data.email);
+      } catch(error) {
+
+      }
+    }
+
+    fetchEmail();
+  }, [])
 
   return (
     <div className="flex min-h-screen w-full">
@@ -33,159 +116,119 @@ const PatientRegister = () => {
             <div className="text-[0.7rem] text-grey-100 font-bold mt-[3rem] mb-[0.8rem]">
               IDENTITAS PENGGUNA
             </div>
-            <label
-              htmlFor="nama"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="nama" className="block mb-2 text-sm font-medium text-gray-900">
               Nama Lengkap
             </label>
             <input
               type="text"
               id="nama"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              name="full_name"
+              value={patientData.full_name}
+              onChange={handleChange}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               placeholder="Nama Lengkap"
               required
             />
           </div>
 
           <div className="mb-5 flex gap-7 w-full">
-            {/* Email field */}
             <div className="w-1/2">
-              <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
                 Email
               </label>
               <input
                 type="email"
                 id="email"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="name@flowbite.com"
+                name="email"
+                value={email}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                placeholder="patient@gmail.com"
                 required
               />
             </div>
 
-            {/* Jenis Kelamin field */}
             <div className="w-1/2">
-              <label
-                htmlFor="jenis-kelamin"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
+              <label htmlFor="jenis-kelamin" className="block mb-2 text-sm font-medium text-gray-900">
                 Jenis Kelamin
               </label>
-              <input
-                type="date"
-                className="px-4 py-2 border rounded-md w-full"
-              />
+              <select
+                id="jenis-kelamin"
+                name="gender"
+                value={patientData.gender}
+                onChange={handleChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                required
+              >
+                <option value="" disabled>
+                  Pilih Jenis Kelamin
+                </option>
+                <option value="MALE">Laki-laki</option>
+                <option value="FEMALE">Perempuan</option>
+              </select>
             </div>
           </div>
 
-          {/* tempat tgl lahir */}
+          {/* Tempat & Tanggal Lahir */}
           <div className="mb-5 flex gap-7 w-full">
-            {/* Email field */}
             <div className="w-1/2">
-              <label
-                htmlFor="tempatlahir"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
+              <label htmlFor="tempatlahir" className="block mb-2 text-sm font-medium text-gray-900">
                 Tempat Lahir
               </label>
               <input
                 type="text"
                 id="tempatlahir"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                name="birth_place"
+                value={patientData.birth_place}
+                onChange={handleChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 placeholder="Tempat Lahir"
                 required
               />
             </div>
 
-            {/* Jenis Kelamin field */}
             <div className="w-1/2">
-              <label
-                htmlFor="jenis-kelamin"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Jenis Kelamin
+              <label htmlFor="tanggal-lahir" className="block mb-2 text-sm font-medium text-gray-900">
+                Tanggal Lahir
               </label>
-              <select
-                id="jenis-kelamin"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                required
-              >
-                <option value="" disabled selected>
-                  Pilih Jenis Kelamin
-                </option>
-                <option value="male">Laki-laki</option>
-                <option value="female">Perempuan</option>
-              </select>
+              <input
+                type="date"
+                id="tanggal-lahir"
+                name="birth_date"
+                value={patientData.birth_date}
+                onChange={handleChange}
+                className="px-4 py-2 border rounded-md w-full"
+              />
             </div>
           </div>
-          {/* tempat tgl lahir */}
 
+          {/* Alamat Domisili */}
           <div className="text-[0.7rem] text-grey-100 font-bold mt-[3rem] mb-[0.8rem]">
             ALAMAT IDENTITAS
           </div>
           <div>
-            <label
-              htmlFor="message"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="domicile" className="block mb-2 text-sm font-medium text-gray-900">
               Alamat Domisili
             </label>
             <textarea
-              id="message"
+              id="domicile"
               rows={4}
-              className="mb-8 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              name="domicile"
+              value={patientData.domicile}
+              onChange={handleChange}
+              className="mb-8 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Masukkan Alamat Tempat Tinggal"
             ></textarea>
           </div>
-          {/* kelurahan */}
-          <div className="mb-5 flex gap-7 w-full">
-            {/* Email field */}
-            <div className="w-1/2">
-              <label
-                htmlFor="tempatlahir"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Desa/Kelurahan
-              </label>
-              <input
-                type="text"
-                id="tempatlahir"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Pilih Kelurahan"
-                required
-              />
-            </div>
 
-            {/* Jenis Kelamin field */}
-            <div className="w-1/2">
-              <label
-                htmlFor="jenis-kelamin"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Kabupaten
-              </label>
-              <input
-                type="text"
-                id="kabupaten"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Pilih Kabupaten"
-                required
-              />
-            </div>
-          </div>
-          {/* tempat tgl lahir */}
-
+          {/* Tombol Submit */}
           <button
             type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            onClick={submitUpdateData}
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             Submit
           </button>
         </form>
-        {/* form pasien */}
       </div>
     </div>
   );

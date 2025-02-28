@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from "../components/Sidebar";
 
 const PatientDetail = () => {
@@ -13,7 +12,7 @@ const PatientDetail = () => {
             width="12"
             height="12"
             fill="currentColor"
-            class="bi bi-chevron-right mb-3"
+            className="bi bi-chevron-right mb-3"
             viewBox="0 0 16 16"
           >
             <path

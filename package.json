@@ -13,6 +13,7 @@
     "@react-leaflet/core": "^2.1.0",
     "axios": "^1.6.2",
     "dom": "^0.0.3",
+    "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^2.4.0",
     "leaflet-geosearch": "^3.11.1",
@@ -24,6 +25,7 @@
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

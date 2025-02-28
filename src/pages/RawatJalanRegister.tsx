@@ -1,6 +1,78 @@
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
+import { variables } from "../constants/variable";
+import { useEffect, useState } from "react";
+
+export interface PatientRegisterToOutpatient {
+  id_patient: string;
+  name: string;
+  birth_date: string;
+  gender: string;
+  address: string;
+  phone_number: string;
+  email: string;
+  url_profile: string;
+}
+
+export interface DoctorDropdown {
+  id_doctor: string;
+  name: string;
+}
 
 const RawatJalanRegister = () => {
+
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [patients, setPatients] = useState<PatientRegisterToOutpatient[]>([]);
+  const [doctors, setDoctors] = useState<DoctorDropdown[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<PatientRegisterToOutpatient | null>(null);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      const url = `${variables.BASE_URL}/patients`
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+          withCredentials: true
+        });
+
+        const patientsData = res.data;
+        setPatients(patientsData);
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    }
+
+    const fetchDoctors = async () => {
+      const url = `${variables.BASE_URL}/doctors`
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+          withCredentials: true
+        });
+
+        const doctorsData = res.data.result;
+        setDoctors(doctorsData);
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    }
+    
+    fetchPatients();
+    fetchDoctors();
+  }, [])
+
+  const handlePatientChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = event.target.value;
+    const patient = patients.find((p) => p.id_patient === selectedId) || null;
+    setSelectedPatient(patient);
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar />
@@ -12,7 +84,7 @@ const RawatJalanRegister = () => {
             width="12"
             height="12"
             fill="currentColor"
-            class="bi bi-chevron-right"
+            className="bi bi-chevron-right"
             viewBox="0 0 16 16"
           >
             <path
@@ -26,7 +98,7 @@ const RawatJalanRegister = () => {
             width="12"
             height="12"
             fill="currentColor"
-            class="bi bi-chevron-right"
+            className="bi bi-chevron-right"
             viewBox="0 0 16 16"
           >
             <path
@@ -63,13 +135,26 @@ const RawatJalanRegister = () => {
                     >
                       Nama Lengkap
                     </label>
-                    <input
+                    {/* <input
                       type="email"
                       id="email"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Ketik Nama Lengkap"
                       required
-                    />
+                    /> */}
+                    <select
+                      id="jenis-kelamin"
+                      onChange={handlePatientChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    >
+                      <option value="" disabled selected>
+                        Pilih Pasien
+                      </option>
+                      {patients.map((patient) => (
+                        <option key={patient.id_patient} value={patient.id_patient}>{patient.name}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Jenis Kelamin field */}
@@ -83,6 +168,8 @@ const RawatJalanRegister = () => {
                     <input
                       type="date"
                       className="px-4 py-2 border rounded-md w-full"
+                      value={selectedPatient?.birth_date.split("T")[0] || ""}
+                      readOnly
                     />
                   </div>
                 </div>
@@ -101,30 +188,25 @@ const RawatJalanRegister = () => {
                       type="text"
                       id="tempatlahir"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Tempat Lahir"
+                      // placeholder="Tempat Lahir"
+                      value={selectedPatient?.address || ""}
                       required
+                      readOnly
                     />
                   </div>
 
                   {/* Jenis Kelamin field */}
                   <div className="w-1/2">
-                    <label
-                      htmlFor="jenis-kelamin"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Jenis Kelamin
-                    </label>
-                    <select
-                      id="jenis-kelamin"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      required
-                    >
-                      <option value="" disabled selected>
-                        Pilih Jenis Kelamin
-                      </option>
-                      <option value="male">Laki-laki</option>
-                      <option value="female">Perempuan</option>
-                    </select>
+                  <label htmlFor="jenis-kelamin" className="block mb-2 text-sm font-medium text-gray-900">
+                Jenis Kelamin
+              </label>
+              <input
+                type="text"
+                id="jenis-kelamin"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                value={selectedPatient?.gender || ""}
+                readOnly
+              />
                   </div>
                 </div>
                 {/* tempat tgl lahir */}
@@ -139,33 +221,27 @@ const RawatJalanRegister = () => {
                     id="message"
                     rows={4}
                     className="mb-4 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Masukkan Alamat Tempat Tinggal"
+                    // placeholder="Masukkan Alamat Tempat Tinggal"
+                    value={selectedPatient?.address || ""}
+                    readOnly
                   ></textarea>
                 </div>
 
                 <div className="w-full mb-8">
-                    <label
-                      htmlFor="tempatlahir"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Nomor Rekam Medis
-                    </label>
-                    <input
-                      type="text"
-                      id="tempatlahir"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Masukkan Nomor Rekam Medis Pasien"
-                      required
-                    />
-                  </div>
-
-
-                <button
-                  type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Submit
-                </button>
+                  <label
+                    htmlFor="tempatlahir"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Nomor Rekam Medis
+                  </label>
+                  <input
+                    type="text"
+                    id="tempatlahir"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Masukkan Nomor Rekam Medis Pasien"
+                    required
+                  />
+                </div>
 
                 <div className="border-1 mt-9"></div>
                 <div className="mt-7 font-bold text-sm">DATA KONTAK</div>
@@ -178,11 +254,12 @@ const RawatJalanRegister = () => {
                     No Telepon
                   </label>
                   <input
-                    type="email"
-                    id="email"
+                    type="text"
+                    id="phoneNumber"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Isi Nomor Telepon Pasien"
-                    required
+                    // placeholder="Isi Nomor Telepon Pasien"
+                    value={selectedPatient?.phone_number || ""}
+                    readOnly
                   />
                 </div>
 
@@ -197,8 +274,8 @@ const RawatJalanRegister = () => {
                     type="email"
                     id="email"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Ketik Email"
-                    required
+                    value={selectedPatient?.email || ""}
+                    readOnly
                   />
                 </div>
               </form>
@@ -223,8 +300,10 @@ const RawatJalanRegister = () => {
                   <option value="" disabled selected>
                     Pilih Dokter yang Tersedia
                   </option>
-                  <option value="male">Laki-laki</option>
-                  <option value="female">Perempuan</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.id_doctor} value={doctor.id_doctor}>dr. {doctor.name}</option>
+                  ))}
+
                 </select>
               </div>
 
@@ -258,6 +337,13 @@ const RawatJalanRegister = () => {
             </div>
           </tbody>
         </table>
+
+        <button
+          type="submit"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-1/5 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          Submit
+        </button>
       </div>
     </div>
   );

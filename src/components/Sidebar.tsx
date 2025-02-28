@@ -12,7 +12,8 @@ const Sidebar = () => {
           tabIndex={-1}
           aria-label="Sidebar"
         >
-          <div className="px-6">
+          <div className="px-6 flex items-center gap-3">
+          <img src="logo-myclinic.png" alt="" className="w-[32px] h-[32px]" />
             <a
               className="flex-none font-semibold text-xl text-black focus:outline-none focus:opacity-80 dark:text-white"
               href="#"

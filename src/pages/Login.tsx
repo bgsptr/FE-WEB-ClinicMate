@@ -1,6 +1,50 @@
-import React from "react";
+import axios from "axios";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { variables } from "../constants/variable";
+import Cookies from "js-cookie";
 
 const Login = () => {
+
+  const [login, setLogin] = useState({
+    email: "",
+    password: ""
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLogin({
+      ...login,
+      [e.target.id]: e.target.value
+    })
+  }
+
+  const navigate = useNavigate();
+
+  const url = `${variables.BASE_URL}/users/login`;
+
+  const changedLoginData = async (e: FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(url, JSON.stringify(login), {
+        headers: {
+          'Content-Type': "application/json"
+        },
+        // withCredentials: true
+      });
+
+      console.log("token", res.data.user);
+      const { token } = res.data.user;
+      // console.log(token);
+      localStorage.setItem("token", token);
+
+
+      navigate('/dashboard');
+    } catch (error) {
+      
+    }
+  }
+
   return (
     <div className="flex w-full min-h-screen">
       <img src="/left-login.png" className="w-1/2 mr-6" />
@@ -24,6 +68,8 @@ const Login = () => {
             <input
               type="email"
               id="email"
+              onChange={handleChange}
+              value={login.email}
               className="mb-6 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Masukkan Email"
               required
@@ -40,6 +86,8 @@ const Login = () => {
             <input
               type="password"
               id="password"
+              onChange={handleChange}
+              value={login.password}
               className="mb-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Masukkan Password"
               required
@@ -55,6 +103,7 @@ const Login = () => {
 
             <button
               type="submit"
+              onClick={changedLoginData}
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Log In
