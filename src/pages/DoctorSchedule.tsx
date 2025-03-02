@@ -1,46 +1,103 @@
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { variables } from "../constants/variable";
+import axios from "axios";
+
+export interface DoctorDropdown {
+  id_doctor: string;
+  name: string;
+}
 
 const DoctorSchedule = () => {
-  const slots = [
-    "16:00",
-    "16:10",
-    "16:20",
-    "16:30",
-    "16:40",
-    "16:50",
-    "17:00",
-    "17:10",
-    "17:20",
-    "17:30",
-    "17:40",
-    "17:50",
-    "18:00",
-    "18:10",
-    "18:20",
-    "18:30",
-    "18:40",
-    "18:50",
-    "19:00",
-    "19:10",
-    "19:20",
-    "19:30",
-    "19:40",
-    "19:50",
-    "20:00",
-    "20:10",
-    "20:20",
-    "20:30",
-    "20:40",
-    "20:50",
-    "21:00",
-    "21:10",
-    "21:20",
-    "21:30",
-    "21:40",
-    "21:50",
+
+  const [slots, setSlots] = useState<string[]>([]);
+  const [token] = useState(localStorage.getItem("token"));
+  const [doctors, setDoctors] = useState<DoctorDropdown[]>([]);
+  const tempSlot: string[] = [];
+
+  const days = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu"
   ];
+
+  const [handleScheduleHour, setHandleScheduleHour] = useState({
+    startTime: "",
+    endTime: "",
+    slot: 0
+  });
+
+  const handleChangeScheduleHour = (e: ChangeEvent<HTMLSelectElement>) => {
+    setHandleScheduleHour({
+      ...handleScheduleHour,
+      [e.target.id]: e.target.value
+    })
+  };
+
+  useEffect(() => {
+    const { startTime, endTime } = handleScheduleHour;
+    const [hourStart, minuteStart] = startTime.split(':').map(Number);
+
+    let minutesConverted: number = hourStart * 60;
+
+    for (let i = 0; i < handleScheduleHour.slot; ++i) {
+      tempSlot.push(`${Math.floor(minutesConverted / 60)}:${(minutesConverted % 60).toString().padStart(2, "0")}`);
+      minutesConverted += 10
+    }
+
+    setSlots(tempSlot);
+
+    return () => setSlots([])
+
+  }, [handleScheduleHour.slot])
+
+  useEffect(() => {
+    const { startTime, endTime } = handleScheduleHour;
+    const [hourStart, minuteStart] = startTime.split(':').map(Number);
+    const [hourEnd, minuteEnd] = endTime.split(':').map(Number);
+    console.log(hourStart, hourEnd)
+    if (hourStart > hourEnd) return;
+    const slot = (hourEnd - hourStart) * 60 / 10 || 0;
+    // console.log(slot)
+    setHandleScheduleHour({
+      ...handleScheduleHour,
+      slot
+    })
+  }, [handleScheduleHour.slot, handleScheduleHour.startTime, handleScheduleHour.endTime])
+
+  // useEffect(() => {
+  //   console.log(handleScheduleHour);
+  // }, [handleScheduleHour])
+
+  // useEffect(() => {
+  //   console.log(slots);
+  // }, [slots])
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const url = `${variables.BASE_URL}/doctors`
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+          withCredentials: true
+        });
+  
+        const doctorsData = res.data.result;
+        setDoctors(doctorsData);
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    }
+
+    fetchDoctors();
+  }, [])
 
   return (
     <div className="flex min-h-screen w-full bg-gray-100 font-poppins">
@@ -130,7 +187,8 @@ const DoctorSchedule = () => {
                         Jam Praktik Dimulai
                       </label>
                       <select
-                        id="jam-praktik-dimulai"
+                        id="startTime"
+                        onChange={handleChangeScheduleHour}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required
                       >
@@ -151,7 +209,8 @@ const DoctorSchedule = () => {
                         Jam Praktik Berakhir
                       </label>
                       <select
-                        id="jam-praktik-berakhir"
+                        id="endTime"
+                        onChange={handleChangeScheduleHour}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required
                       >
@@ -174,6 +233,7 @@ const DoctorSchedule = () => {
                     <input
                       type="text"
                       id="hari-praktik"
+                      value={handleScheduleHour.slot}
                       className="px-4 py-2 border rounded-md w-full"
                     />
                     <div className="absolute right-7 top-9 font-light text-gray-600">

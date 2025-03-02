@@ -1,7 +1,10 @@
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { variables } from "../constants/variable";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { OutpatientSecondePage } from "../components/OutpatientSecondPage";
+import { getEcryptedLocalStorage, setEcryptedLocalStorage } from "../utils/local-storage-crypto";
+import { useNavigate } from "react-router-dom";
 
 export interface PatientRegisterToOutpatient {
   id_patient: string;
@@ -19,12 +22,40 @@ export interface DoctorDropdown {
   name: string;
 }
 
+export interface DoctorMenuRegister {
+  doctorId: string | null;
+  consultDate: string | null;
+  hourStartTime: string | null;
+}
+
+export interface AvailableQueueSchedule {
+  queueNo: number;
+  startTime: string;
+  endTime: string;
+  availableStatus: boolean;
+}
+
 const RawatJalanRegister = () => {
 
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token] = useState(localStorage.getItem('token'));
   const [patients, setPatients] = useState<PatientRegisterToOutpatient[]>([]);
   const [doctors, setDoctors] = useState<DoctorDropdown[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<PatientRegisterToOutpatient | null>(null);
+  const [queues, setQueues] = useState<AvailableQueueSchedule[]>([]);
+
+  const [doctorMenu, setDoctorMenu] = useState<DoctorMenuRegister>({
+    doctorId: null,
+    consultDate: null,
+    hourStartTime: null
+  });
+
+  // const [menuLocalStorage, setMenuLocalStorage] = useState(localStorage.getItem("doctorMenu"));
+  const getLocal = getEcryptedLocalStorage("doctorMenu");
+  const [storedValue, setStoredValue] = useState<{ doctorId: string, consultDate: string } | null>(getLocal && JSON.parse(getLocal) || null);
+
+  // useEffect(() => {
+  //   console.log(storedValue)
+  // }, [storedValue])
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -67,13 +98,83 @@ const RawatJalanRegister = () => {
     fetchDoctors();
   }, [])
 
+  // useEffect(() => {
+
+
+  //   fetchSelectedSchedule();
+
+  // }, [doctorMenu])
+
+
+  // const fetchSelectedScheduleFromAPI = async (e: any) => {
+  //   e.preventDefault();
+    
+  //   const url = `${variables.BASE_URL}/doctors/${doctorMenu.doctorId}/schedules?consult_date=${doctorMenu.consultDate}`
+  //   try {
+  //     const res = await axios.get(url, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       withCredentials: true
+  //     });
+
+  //     const queueDatas = res.data;
+  //     setQueues(queueDatas);
+  //   } catch (error) {
+  //     console.error("Error fetching patients:", error);
+  //   }
+  // }
+
   const handlePatientChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = event.target.value;
     const patient = patients.find((p) => p.id_patient === selectedId) || null;
     setSelectedPatient(patient);
   };
 
-  return (
+  const handleConsultDate = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setDoctorMenu({
+      ...doctorMenu,
+      [event.target.id]: event.target.value
+    });
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(doctorMenu);
+  }, [doctorMenu])
+
+  const saveLocalAndRedirect = async (e: FormEvent) => {
+    e.preventDefault();
+    const { doctorId, consultDate } = doctorMenu;
+    // localStorage.setItem('doctorMenu', JSON.stringify({ doctorId, consultDate }));
+
+    const url = `${variables.BASE_URL}/doctors/${doctorId}/schedules?consult_date=${consultDate}`
+    try {
+      const res = await axios.get(url, {
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        withCredentials: true
+      });
+
+      const queueDatas = res.data;
+      setQueues(queueDatas);
+
+      setEcryptedLocalStorage("doctorMenu", JSON.stringify({ doctorId, consultDate }));
+
+      navigate(0)
+
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+    }
+  }
+
+  return (storedValue?.doctorId && storedValue?.consultDate) ? (
+    <OutpatientSecondePage queues={queues} selectedDoctor={doctorMenu} />
+  ) : (
     <div className="flex min-h-screen w-full">
       <Sidebar />
       <div className="bg-gray-100 w-full px-[6rem] py-[2rem] flex flex-col gap-7">
@@ -293,7 +394,8 @@ const RawatJalanRegister = () => {
                   Nama Nakes
                 </label>
                 <select
-                  id="jenis-kelamin"
+                  id="doctorId"
+                  onChange={handleConsultDate}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
                 >
@@ -317,6 +419,8 @@ const RawatJalanRegister = () => {
                   </label>
                   <input
                     type="date"
+                    id="consultDate"
+                    onChange={handleConsultDate}
                     className="px-4 py-2 border rounded-md w-full"
                   />
                 </div>
@@ -340,13 +444,14 @@ const RawatJalanRegister = () => {
 
         <button
           type="submit"
+          onClick={saveLocalAndRedirect}
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-1/5 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Submit
         </button>
       </div>
     </div>
-  );
+  )
 };
 
 export default RawatJalanRegister;

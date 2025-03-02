@@ -1,0 +1,105 @@
+/* Styling utama */
+.react-calendar {
+    width: 100%; /* Menyesuaikan dengan container */
+    height: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 20px;
+  }
+  
+  /* Header (bulan & tahun) */
+  .react-calendar__navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Tombol prev & next */
+  .react-calendar__navigation button {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .react-calendar__navigation button:hover {
+    color: #007bff;
+  }
+  
+  /* Grid tanggal agar responsif */
+  .react-calendar__month-view__days {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    padding: 10px;
+  }
+  
+  /* Styling tiap tanggal */
+  .react-calendar__tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Mengikuti ukuran parent */
+    aspect-ratio: 1; /* Membuatnya tetap kotak */
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Hover effect */
+  .react-calendar__tile:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  /* Tanggal aktif yang dipilih */
+  .react-calendar__tile--active {
+    background: #000;
+    color: #007bff;
+    font-size: x-large;
+  }
+  
+  /* Tanggal tidak tersedia */
+  .react-calendar__tile:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Weekend (Minggu) */
+  /* .react-calendar__month-view__days__day--weekend {
+    color: red;
+  } */
+  
+  /* Header nama hari */
+  .react-calendar__month-view__weekdays {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+    padding-bottom: 10px;
+    text-align: center;
+    color: #555;
+  }
+
+  /* Sembunyikan tanggal dari bulan lain */
+  .react-calendar__month-view__days__day--neighboringMonth {
+    color: #ccc;
+  }
+  
+  
+  /* Responsive untuk layar kecil */
+  @media (max-width: 600px) {
+    .react-calendar__tile {
+      font-size: 0.9rem;
+    }
+  }
+  
