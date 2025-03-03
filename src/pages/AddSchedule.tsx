@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { variables } from "../constants/variable";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export interface Schedule {
   id_schedule: string;
@@ -19,6 +19,7 @@ export interface DoctorSchedule {
 }
 
 const AddSchedule = () => {
+  const navigate = useNavigate();
   const { doctor_id } = useParams();
   // console.log(doctor_id);
   const token = localStorage.getItem("token");
@@ -74,6 +75,7 @@ const AddSchedule = () => {
             <div className="flex gap-7 w-full"></div>
 
             <button
+              onClick={() => navigate("../jadwal_praktik")}
               type="submit"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-1/4 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >

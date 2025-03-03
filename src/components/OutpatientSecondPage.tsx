@@ -7,6 +7,7 @@ import { variables } from "../constants/variable";
 import axios from "axios";
 import "react-calendar/dist/Calendar.css";
 import "./cal.css";
+import { useNavigate } from "react-router-dom";
 
 interface QueueSchedule {
   queueNo: number;
@@ -16,6 +17,7 @@ interface QueueSchedule {
 }
 
 export const OutpatientSecondePage = (props: { queues: AvailableQueueSchedule[], selectedDoctor: DoctorMenuRegister }) => {
+  const navigate = useNavigate();
   const { selectedDoctor } = props;
 
   const [queueArrays, setQueueArrays] = useState<QueueSchedule[]>([]);
@@ -48,7 +50,7 @@ export const OutpatientSecondePage = (props: { queues: AvailableQueueSchedule[],
   };
 
   useEffect(() => {
-    console.log(queueArrays)
+    console.log(queueArrays);
 
     fetchSchedulePageTwo();
   }, [selectedDate]);
@@ -58,6 +60,12 @@ export const OutpatientSecondePage = (props: { queues: AvailableQueueSchedule[],
     setSelectedDate(formattedDateISO);
     setDate(selectedDate);
   };
+
+  const resetAndGoBackToPageOne = () => {
+    localStorage.removeItem("doctorMenu");
+
+    navigate(0);
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-gray-100">
@@ -75,13 +83,31 @@ export const OutpatientSecondePage = (props: { queues: AvailableQueueSchedule[],
               value={date}
               className="w-full border-none shadow-sm rounded-md"
             />
+            <div className="ml-9">
+              {/* Submit Button */}
+              <button
+                onClick={resetAndGoBackToPageOne}
+                type="submit"
+                className="mt-8 mr-3 text-[#478CCF] border-1 border-blue-500 bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Kembali
+              </button>
+
+              <button
+                type="submit"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Simpan
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Kanan: Pilih Waktu */}
         <div className="bg-white shadow-md p-6 rounded-lg w-1/3">
           <h2 className="text-lg font-semibold mb-4">Pilih Waktu</h2>
-          <p className="text-gray-600 mb-2">Tanggal yang dipilih: <strong>{date.toDateString()}</strong></p>
+          <p className="text-gray-600 mb-2">Tanggal yang dipilih: <strong>{selectedDate}</strong></p>
+          <p className="text-gray-600 mb-2">Doktor: <strong>{date.toDateString()}</strong></p>
 
           {/* List Waktu */}
           <div className="grid grid-cols-2 gap-3">

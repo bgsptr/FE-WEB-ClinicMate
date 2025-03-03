@@ -1,4 +1,25 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { socket } from "../socket";
+
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const currLocation = window.location.href;
+  const parameterURL = currLocation.slice(22).split("/")[0];
+
+  useEffect(() => {
+    console.log(parameterURL);
+  }, [parameterURL]);
+
+  const isActive = (path: string) => parameterURL === path;
+
+  const joinSocketAndNavigate = () => {
+    // e.preventDefault();
+
+    navigate('/chat');
+  }
+
   return (
     <div className="flex p-6">
       <p>Klinik Ananta</p>
@@ -11,7 +32,11 @@ const Sidebar = () => {
           aria-label="Sidebar"
         >
           <div className="px-6 flex items-center gap-3">
-          <img src="logo-myclinic.png" alt="" className="w-[32px] h-[32px]" />
+            <img
+              src="https://storage.googleapis.com/clinic-mate/logo-myclinic.png"
+              alt=""
+              className="w-[32px] h-[32px]"
+            />
             <a
               className="flex-none font-semibold text-xl text-black focus:outline-none focus:opacity-80 dark:text-white"
               href="#"
@@ -27,8 +52,12 @@ const Sidebar = () => {
             <ul className="space-y-1.5">
               <li>
                 <a
-                  className="font-semibold flex items-center gap-x-3.5 py-2 px-2.5 bg-gray-100 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:bg-neutral-700 dark:text-white"
-                  href="#"
+                  className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("dashboard")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
+                  onClick={() => navigate("../dashboard")}
                 >
                   <svg
                     className="size-4"
@@ -49,12 +78,14 @@ const Sidebar = () => {
                 </a>
               </li>
 
-              <li className="hs-accordion" id="users-accordion">
-                <button
-                  type="button"
-                  className="font-semibold hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                  aria-expanded="true"
-                  aria-controls="users-accordion"
+              <li>
+                <a
+                  className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("rawat_jalan")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
+                  onClick={() => navigate("/rawat_jalan")}
                 >
                   <svg
                     className="size-4"
@@ -74,200 +105,15 @@ const Sidebar = () => {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                   Rawat Jalan
-                  <svg
-                    className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m18 15-6-6-6 6" />
-                  </svg>
-                  <svg
-                    className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-
-                <div
-                  id="users-accordion"
-                  className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                  role="region"
-                  aria-labelledby="users-accordion"
-                >
-                  <ul
-                    className="hs-accordion-group ps-3 pt-2"
-                    data-hs-accordion-always-open
-                  >
-                    <li className="hs-accordion" id="users-accordion-sub-1">
-                      <button
-                        type="button"
-                        className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                        aria-expanded="true"
-                        aria-controls="users-accordion-sub-1"
-                      >
-                        Sub Menu 1
-                        <svg
-                          className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="m18 15-6-6-6 6" />
-                        </svg>
-                        <svg
-                          className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-
-                      <div
-                        id="users-accordion-sub-1"
-                        className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                        role="region"
-                        aria-labelledby="users-accordion-sub-1"
-                      >
-                        <ul className="pt-2 ps-2">
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 1
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 2
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 3
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
-                    <li className="hs-accordion" id="users-accordion-sub-2">
-                      <button
-                        type="button"
-                        className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                        aria-expanded="true"
-                        aria-controls="users-accordion-sub-2"
-                      >
-                        Sub Menu 2
-                        <svg
-                          className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="m18 15-6-6-6 6" />
-                        </svg>
-                        <svg
-                          className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-
-                      <div
-                        id="users-accordion-sub-2"
-                        className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                        role="region"
-                        aria-labelledby="users-accordion-sub-2"
-                      >
-                        <ul className="pt-2 ps-2">
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 1
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 2
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                              href="#"
-                            >
-                              Link 3
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                </a>
               </li>
 
-              <li className="hs-accordion" id="account-accordion">
-                <button
-                  type="button"
-                  className="font-semibold hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                  aria-expanded="true"
-                  aria-controls="account-accordion"
+              <li>
+                <a
+                  className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("pasien") ? "bg-gray-100 dark:bg-neutral-700" : ""
+                  }`}
+                  onClick={() => navigate("/patient")}
                 >
                   <svg
                     className="size-4"
@@ -294,77 +140,17 @@ const Sidebar = () => {
                     <path d="m20.7 13.8 1-.4" />
                   </svg>
                   Pasien
-                  <svg
-                    className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m18 15-6-6-6 6" />
-                  </svg>
-                  <svg
-                    className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-
-                <div
-                  id="account-accordion"
-                  className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                  role="region"
-                  aria-labelledby="account-accordion"
-                >
-                  <ul className="pt-2 ps-2">
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 1
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 2
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 3
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                </a>
               </li>
 
-              <li className="hs-accordion" id="projects-accordion">
-                <button
-                  type="button"
-                  className="font-semibold hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                  aria-expanded="true"
-                  aria-controls="projects-accordion"
+              <li>
+                <a
+                  className={`font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("riwayat_antrian")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
+                  href="#"
                 >
                   <svg
                     className="size-4"
@@ -383,75 +169,17 @@ const Sidebar = () => {
                     <path d="M15 2v5h5" />
                   </svg>
                   Riwayat Antrian
-                  <svg
-                    className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m18 15-6-6-6 6" />
-                  </svg>
-                  <svg
-                    className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-
-                <div
-                  id="projects-accordion"
-                  className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                  role="region"
-                  aria-labelledby="projects-accordion"
-                >
-                  <ul className="pt-2 ps-2">
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 1
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 2
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                        href="#"
-                      >
-                        Link 3
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                </a>
               </li>
 
               <li>
                 <a
-                  className="font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
-                  href="#"
+                  className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("jadwal_praktik")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
+                  onClick={() => navigate("/jadwal_praktik/list")}
                 >
                   <svg
                     className="size-4"
@@ -479,9 +207,14 @@ const Sidebar = () => {
                   Jadwal Praktik
                 </a>
               </li>
+
               <li>
                 <a
-                  className="font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className={`font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("rekam_medis")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
                   href="#"
                 >
                   <svg
@@ -500,6 +233,33 @@ const Sidebar = () => {
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                   </svg>
                   Rekam Medis
+                </a>
+              </li>
+
+              <li>
+                <a
+                  className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                    isActive("chat")
+                      ? "bg-gray-100 dark:bg-neutral-700"
+                      : ""
+                  }`}
+                  onClick={joinSocketAndNavigate}
+                >
+                  <svg
+                    className="size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.88-.94L3 21l1.12-4.12A8.38 8.38 0 0 1 3 11.5a8.5 8.5 0 0 1 17 0Z" />
+                  </svg>
+                  Chat
                 </a>
               </li>
             </ul>

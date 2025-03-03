@@ -7,7 +7,7 @@ import StatusTabs from "../components/outpatient-schedule/StatusTabs";
 import OutpatientTableRow from "../components/outpatient-schedule/OutpatientTableRow";
 import { RawatJalan } from "../components/types";
 
-const RawatJalanSchedule = () => {
+const   RawatJalanSchedule = () => {
   const [outpatients, setOutpatients] = useState<RawatJalan[]>([]);
   const [status, setStatus] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");

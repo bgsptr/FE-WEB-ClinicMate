@@ -40,7 +40,7 @@ const Register = () => {
 
   return (
     <div className="flex w-full min-h-screen bg-[#f6f6f6]">
-      <img src="/left-login.png" className="w-1/2 mr-6" />
+      <img src="/left-login.png" className="w-1/2" />
       <div className="py-[3rem] w-1/2 px-[10rem] flex flex-col gap-2">
         <div className="flex items-center gap-3">
           <img src="logo-myclinic.png" alt="" className="w-[32px] h-[32px]" />
@@ -67,7 +67,7 @@ const Register = () => {
             />
           </div>
 
-          <div className="w-full">
+          {/* <div className="w-full">
             <label
               htmlFor="nama"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -81,7 +81,7 @@ const Register = () => {
               placeholder="Masukkan Nama"
               required
             />
-          </div>
+          </div> */}
 
           <div className="w-full">
             <label

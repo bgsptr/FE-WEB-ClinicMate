@@ -11,6 +11,7 @@ import DoctorSchedule from "./pages/DoctorSchedule";
 import ScheduleList from "./pages/ScheduleList";
 import AddSchedule from "./pages/AddSchedule";
 import Dashboard from "./pages/Dashboard";
+import Chat from "./pages/Chat";
 
 const Root = () => {
   return (
@@ -27,6 +28,7 @@ const Root = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
     </Suspense>
   );

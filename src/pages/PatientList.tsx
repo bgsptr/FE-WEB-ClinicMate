@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { variables } from "../constants/variable";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export interface Patient {
   id_patient: string;
@@ -20,6 +21,8 @@ const PatientList = () => {
   useEffect(() => {
     console.log("token", token);
   }, [token]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -76,7 +79,7 @@ const PatientList = () => {
                 />
               </div>
 
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-semibold">
+              <button onClick={() => navigate("register")} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-semibold">
                 + Pasien
               </button>
             </div>

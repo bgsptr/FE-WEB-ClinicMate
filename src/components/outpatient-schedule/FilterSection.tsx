@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface FilterSectionProps {
   onSearch: (query: string) => void;
@@ -6,6 +7,8 @@ interface FilterSectionProps {
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex justify-between w-full">
       <div className="flex gap-7 w-full">
@@ -54,6 +57,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
       </div>
       <button
         type="submit"
+        onClick={() => navigate("register")}
         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[15%] px-5 py-2.5 text-center"
       >
         + Registrasi

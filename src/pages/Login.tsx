@@ -47,7 +47,7 @@ const Login = () => {
 
   return (
     <div className="flex w-full min-h-screen">
-      <img src="/left-login.png" className="w-1/2 mr-6" />
+      <img src="/left-login.png" className="w-1/2" />
       <div className="py-[5rem] w-1/2 px-[10rem] flex flex-col gap-2 bg-[#f6f6f6]">
         <div className="flex items-center gap-3">
           <img src="logo-myclinic.png" alt="" className="w-[32px] h-[32px]" />
