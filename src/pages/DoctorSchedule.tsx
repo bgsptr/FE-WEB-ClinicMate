@@ -12,7 +12,7 @@ export interface DoctorDropdown {
 const DoctorSchedule = () => {
 
   const [slots, setSlots] = useState<string[]>([]);
-  const [token] = useState(localStorage.getItem("token"));
+  // const [token] = useState(localStorage.getItem("token"));
   const [doctors, setDoctors] = useState<DoctorDropdown[]>([]);
   const tempSlot: string[] = [];
 
@@ -87,7 +87,7 @@ const DoctorSchedule = () => {
         const res = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${token}`
+            // 'Authorization': `Bearer ${token}`
           },
           withCredentials: true
         });

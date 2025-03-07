@@ -1,13 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { variables } from "../../constants/variable";
+import axios from "axios";
+import { DoctorDropdown } from "../../pages/RawatJalanRegister";
 
 interface FilterSectionProps {
   onSearch: (query: string) => void;
   onFilterChange: (filter: string) => void;
 }
 
-const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange }) => {
+const FilterSection: React.FC<FilterSectionProps> = ({
+  onSearch,
+  onFilterChange,
+}) => {
+  const [token] = useState(localStorage.getItem("token"));
+  const [doctorsDropdown, setDoctorsDropdown] = useState<
+    DoctorDropdown[] | null
+  >([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const url = `${variables.BASE_URL}/doctors`;
+      try {
+        const res = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setDoctorsDropdown(res.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   return (
     <div className="flex justify-between w-full">
@@ -20,8 +49,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
             <option value="" disabled selected>
               Cari Nama Dokter
             </option>
-            <option value="male">Laki-laki</option>
-            <option value="female">Perempuan</option>
+            {doctorsDropdown?.map((doctor) => (
+              <option value={doctor.id_doctor}>{doctor.name}</option>
+            ))}
           </select>
         </div>
         <div className="w-1/4">
@@ -40,7 +70,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch, onFilterChange 
           <input
             type="text"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            placeholder="Cari no RM atau nama pasien"
+            placeholder="Cari Nama/No.Telp pasien"
             onChange={(e) => onSearch(e.target.value)}
           />
           <svg

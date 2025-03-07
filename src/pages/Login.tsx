@@ -1,10 +1,11 @@
 import axios from "axios";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { variables } from "../constants/variable";
 import Cookies from "js-cookie";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
 
   const [login, setLogin] = useState({
     email: "",
@@ -30,16 +31,19 @@ const Login = () => {
         headers: {
           'Content-Type': "application/json"
         },
-        // withCredentials: true
+        withCredentials: true
       });
 
       console.log("token", res.data.user);
       const { token } = res.data.user;
-      // console.log(token);
+      Cookies.set("token", token)
       localStorage.setItem("token", token);
 
+      setTimeout(() => {
+        navigate('/dashboard');
+        navigate(0)
+    }, 100); 
 
-      navigate('/dashboard');
     } catch (error) {
       
     }

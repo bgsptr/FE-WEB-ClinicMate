@@ -7,13 +7,13 @@ import StatusTabs from "../components/outpatient-schedule/StatusTabs";
 import OutpatientTableRow from "../components/outpatient-schedule/OutpatientTableRow";
 import { RawatJalan } from "../components/types";
 
-const   RawatJalanSchedule = () => {
+const RawatJalanSchedule = () => {
   const [outpatients, setOutpatients] = useState<RawatJalan[]>([]);
   const [status, setStatus] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("");
 
-  const token = localStorage.getItem("token");
+  // const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchOutpatients = async () => {
@@ -22,8 +22,9 @@ const   RawatJalanSchedule = () => {
         const res = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
           },
+          withCredentials: true
         });
         setOutpatients(res.data);
       } catch (error) {
@@ -31,7 +32,7 @@ const   RawatJalanSchedule = () => {
       }
     };
     fetchOutpatients();
-  }, [status, token]);
+  }, [status]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);

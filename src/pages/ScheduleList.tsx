@@ -22,7 +22,7 @@ const ScheduleList = () => {
 
   const navigate = useNavigate();
 
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  // const [token, setToken] = useState(localStorage.getItem("token"));
   const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
   
   useEffect(() => {
@@ -32,8 +32,9 @@ const ScheduleList = () => {
         const res = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
+            // Authorization: `Bearer ${token}`
+          },
+          withCredentials: true
         });
         setSchedules(res.data.result);
       } catch (error) {

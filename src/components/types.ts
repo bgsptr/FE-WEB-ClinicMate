@@ -22,3 +22,17 @@ export const MessageSenderProfile: {
 
 export type MessageSenderProfile =
   (typeof MessageSenderProfile)[keyof typeof MessageSenderProfile];
+
+export const Role: {
+  ADMIN: "ADMIN";
+  DOCTOR: "DOCTOR";
+  PATIENT: "PATIENT";
+} = {
+  ADMIN: "ADMIN",
+  DOCTOR: "DOCTOR",
+  PATIENT: "PATIENT",
+};
+
+export type Role =
+  (typeof Role)[keyof typeof Role];
+  

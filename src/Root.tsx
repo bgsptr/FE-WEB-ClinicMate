@@ -12,24 +12,86 @@ import ScheduleList from "./pages/ScheduleList";
 import AddSchedule from "./pages/AddSchedule";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoutes from "./components/ProtectedRoute";
+import { Role } from "./components/types";
 
 const Root = () => {
   return (
     <Suspense>
+      <AuthProvider>
         <Routes>
-          <Route path="/patient" element={<PatientList />} />
-          <Route path="/patient/register" element={<PatientRegister />} />
-          <Route path="/rawat_jalan" element={<RawatJalanSchedule />} />
-          <Route path="/rawat_jalan/register" element={<RawatJalanRegister />} />
+          <Route path="/forbidden" element={<h2>Unauthorized</h2>} />
+          <Route path="/login" element={<Login />} />
+
+          <Route
+            path="/patient"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <PatientList />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route path="/register" element={<Register />} />
+
+          <Route
+            path="/patient"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <PatientList />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route
+            path="/rawat_jalan"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <RawatJalanSchedule />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route
+            path="/rawat_jalan/register"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <RawatJalanRegister />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route
+            path="/patient/register"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <PatientRegister />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route
+            path="/jadwal_praktik/list"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <ScheduleList />
+              </ProtectedRoutes>
+            }
+          />
+
+          {/* <Route path="/rawat_jalan" element={<RawatJalanSchedule />} /> */}
+          {/* <Route path="/rawat_jalan/register" element={<RawatJalanRegister />} /> */}
+
           <Route path="/patient_detail" element={<PatientDetail />} />
           <Route path="/jadwal_praktik" element={<DoctorSchedule />} />
-          <Route path="/jadwal_praktik/list" element={<ScheduleList />} />
+          {/* <Route path="/jadwal_praktik/list" element={<ScheduleList />} /> */}
           <Route path="/jadwal_praktik/:doctor_id" element={<AddSchedule />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />
         </Routes>
+      </AuthProvider>
     </Suspense>
   );
 };

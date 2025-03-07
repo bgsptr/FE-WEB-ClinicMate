@@ -23,9 +23,12 @@ export interface DoctorDropdown {
 }
 
 export interface DoctorMenuRegister {
+  patientId: string | null;
   doctorId: string | null;
-  consultDate: string | null;
+  outpatientQueueDate: string | null;
   hourStartTime: string | null;
+  visitDate: Date | string | null;
+  queueNo: number | null;
 }
 
 export interface AvailableQueueSchedule {
@@ -44,18 +47,21 @@ const RawatJalanRegister = () => {
   const [queues, setQueues] = useState<AvailableQueueSchedule[]>([]);
 
   const [doctorMenu, setDoctorMenu] = useState<DoctorMenuRegister>({
+    patientId: null,
     doctorId: null,
-    consultDate: null,
-    hourStartTime: null
+    outpatientQueueDate: null,
+    hourStartTime: null,
+    visitDate: null,
+    queueNo: null
   });
 
   // const [menuLocalStorage, setMenuLocalStorage] = useState(localStorage.getItem("doctorMenu"));
   const getLocal = getEcryptedLocalStorage("doctorMenu");
-  const [storedValue, setStoredValue] = useState<{ doctorId: string, consultDate: string } | null>(getLocal && JSON.parse(getLocal) || null);
+  const [storedValue, setStoredValue] = useState<{ doctorId: string, outpatientQueueDate: string } | null>(getLocal && JSON.parse(getLocal) || null);
 
-  // useEffect(() => {
-  //   console.log(storedValue)
-  // }, [storedValue])
+  useEffect(() => {
+    console.log(doctorMenu)
+  }, [doctorMenu])
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -109,7 +115,7 @@ const RawatJalanRegister = () => {
   // const fetchSelectedScheduleFromAPI = async (e: any) => {
   //   e.preventDefault();
     
-  //   const url = `${variables.BASE_URL}/doctors/${doctorMenu.doctorId}/schedules?consult_date=${doctorMenu.consultDate}`
+  //   const url = `${variables.BASE_URL}/doctors/${doctorMenu.doctorId}/schedules?consult_date=${doctorMenu.outpatientQueueDate}`
   //   try {
   //     const res = await axios.get(url, {
   //       headers: {
@@ -130,6 +136,8 @@ const RawatJalanRegister = () => {
     const selectedId = event.target.value;
     const patient = patients.find((p) => p.id_patient === selectedId) || null;
     setSelectedPatient(patient);
+
+    handleConsultDate(event);
   };
 
   const handleConsultDate = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -147,10 +155,10 @@ const RawatJalanRegister = () => {
 
   const saveLocalAndRedirect = async (e: FormEvent) => {
     e.preventDefault();
-    const { doctorId, consultDate } = doctorMenu;
-    // localStorage.setItem('doctorMenu', JSON.stringify({ doctorId, consultDate }));
+    const { patientId, doctorId, outpatientQueueDate } = doctorMenu;
+    // localStorage.setItem('doctorMenu', JSON.stringify({ doctorId, outpatientQueueDate }));
 
-    const url = `${variables.BASE_URL}/doctors/${doctorId}/schedules?consult_date=${consultDate}`
+    const url = `${variables.BASE_URL}/doctors/${doctorId}/schedules?consult_date=${outpatientQueueDate}`
     try {
       const res = await axios.get(url, {
         headers: {
@@ -163,7 +171,7 @@ const RawatJalanRegister = () => {
       const queueDatas = res.data;
       setQueues(queueDatas);
 
-      setEcryptedLocalStorage("doctorMenu", JSON.stringify({ doctorId, consultDate }));
+      setEcryptedLocalStorage("doctorMenu", JSON.stringify({ patientId, doctorId, outpatientQueueDate }));
 
       navigate(0)
 
@@ -172,8 +180,8 @@ const RawatJalanRegister = () => {
     }
   }
 
-  return (storedValue?.doctorId && storedValue?.consultDate) ? (
-    <OutpatientSecondePage queues={queues} selectedDoctor={doctorMenu} />
+  return (storedValue?.doctorId && storedValue?.outpatientQueueDate) ? (
+    <OutpatientSecondePage queues={queues} outpatientData={doctorMenu} setOutpatientData={setDoctorMenu} />
   ) : (
     <div className="flex min-h-screen w-full">
       <Sidebar />
@@ -244,7 +252,7 @@ const RawatJalanRegister = () => {
                       required
                     /> */}
                     <select
-                      id="jenis-kelamin"
+                      id="patientId"
                       onChange={handlePatientChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       required
@@ -419,7 +427,7 @@ const RawatJalanRegister = () => {
                   </label>
                   <input
                     type="date"
-                    id="consultDate"
+                    id="outpatientQueueDate"
                     onChange={handleConsultDate}
                     className="px-4 py-2 border rounded-md w-full"
                   />
