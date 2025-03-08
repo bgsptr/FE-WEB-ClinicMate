@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface RawatJalan {
   id_rawat_jalan: string;
   id_patient: string;
@@ -10,6 +12,10 @@ export interface RawatJalan {
   queue_no: number;
   queue_status: string;
   id_queue: number;
+}
+
+export interface Props {
+  children?: ReactNode;
 }
 
 export const MessageSenderProfile: {

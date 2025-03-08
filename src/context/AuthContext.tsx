@@ -1,13 +1,20 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
 // import jwtDecode from 'jwt-decode';
 import axios from "axios";
 import Cookies from "js-cookie";
 import { variables } from "../constants/variable";
 import { getEcryptedLocalStorage, setEcryptedLocalStorage } from "../utils/local-storage-crypto";
+import { Props } from "../components/types";
 
-const AuthContext = createContext(null);
+type AuthContextType = {
+    role: string;
+    logout: () => void;
+    setRole: Dispatch<SetStateAction<string>>;
+}
 
-export const AuthProvider = ({ children }) => {
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider = ({ children }: Props) => {
     const [role, setRole] = useState(getEcryptedLocalStorage("role")!);
     
     useEffect(() => {
