@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { variables } from "../constants/variable";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 interface PatientRegister {
   full_name: string;
@@ -15,8 +15,8 @@ interface PatientRegister {
 const PatientRegister = () => {
   const token = localStorage.getItem("token");
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+  // const [, setIsSidebarOpen] = useState(false);
+  // const [, setOpenAccordion] = useState<number | null>(null);
   const [patientData, setPatientData] = useState<PatientRegister>({
     full_name: "",
     birth_place: "",
@@ -28,14 +28,14 @@ const PatientRegister = () => {
   const [email, setEmail] = useState("");
 
   // Toggle the sidebar open/close
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
+  // const handleSidebarToggle = () => {
+  //   setIsSidebarOpen((prev) => !prev);
+  // };
 
   // Toggle accordion items
-  const handleAccordionToggle = (index: number) => {
-    setOpenAccordion((prevIndex) => (prevIndex === index ? null : index));
-  };
+  // const handleAccordionToggle = (index: number) => {
+  //   setOpenAccordion((prevIndex) => (prevIndex === index ? null : index));
+  // };
 
   // Handle input change
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

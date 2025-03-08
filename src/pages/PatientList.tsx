@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { variables } from "../constants/variable";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 export interface Patient {

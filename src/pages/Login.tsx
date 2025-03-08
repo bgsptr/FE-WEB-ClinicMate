@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { variables } from "../constants/variable";
 import Cookies from "js-cookie";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const [login, setLogin] = useState({
     email: "",

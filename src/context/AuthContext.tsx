@@ -6,8 +6,8 @@ import { variables } from "../constants/variable";
 import { getEcryptedLocalStorage, setEcryptedLocalStorage } from "../utils/local-storage-crypto";
 import { Props } from "../components/types";
 
-type AuthContextType = {
-    role: string;
+export type AuthContextType = {
+    role: string | null;
     logout: () => void;
     setRole: Dispatch<SetStateAction<string>>;
 }

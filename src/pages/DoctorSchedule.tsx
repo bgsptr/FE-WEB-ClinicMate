@@ -13,20 +13,20 @@ const DoctorSchedule = () => {
 
   const [slots, setSlots] = useState<string[]>([]);
   // const [token] = useState(localStorage.getItem("token"));
-  const [doctors, setDoctors] = useState<DoctorDropdown[]>([]);
+  const [, setDoctors] = useState<DoctorDropdown[]>([]);
   const tempSlot: string[] = [];
 
   const navigate = useNavigate();
 
-  const days = [
-    "Minggu",
-    "Senin",
-    "Selasa",
-    "Rabu",
-    "Kamis",
-    "Jumat",
-    "Sabtu"
-  ];
+  // const days = [
+  //   "Minggu",
+  //   "Senin",
+  //   "Selasa",
+  //   "Rabu",
+  //   "Kamis",
+  //   "Jumat",
+  //   "Sabtu"
+  // ];
 
   const [handleScheduleHour, setHandleScheduleHour] = useState({
     startTime: "",
@@ -42,8 +42,8 @@ const DoctorSchedule = () => {
   };
 
   useEffect(() => {
-    const { startTime, endTime } = handleScheduleHour;
-    const [hourStart, minuteStart] = startTime.split(':').map(Number);
+    const { startTime, } = handleScheduleHour;
+    const [hourStart,] = startTime.split(':').map(Number);
 
     let minutesConverted: number = hourStart * 60;
 
@@ -60,8 +60,8 @@ const DoctorSchedule = () => {
 
   useEffect(() => {
     const { startTime, endTime } = handleScheduleHour;
-    const [hourStart, minuteStart] = startTime.split(':').map(Number);
-    const [hourEnd, minuteEnd] = endTime.split(':').map(Number);
+    const [hourStart,] = startTime.split(':').map(Number);
+    const [hourEnd,] = endTime.split(':').map(Number);
     console.log(hourStart, hourEnd)
     if (hourStart > hourEnd) return;
     const slot = (hourEnd - hourStart) * 60 / 10 || 0;

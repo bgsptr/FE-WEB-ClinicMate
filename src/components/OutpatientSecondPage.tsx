@@ -1,8 +1,8 @@
 import {
   Dispatch,
-  EventHandler,
+  // EventHandler,
   FormEvent,
-  MouseEvent,
+  // MouseEvent,
   SetStateAction,
   useEffect,
   useState,
@@ -41,7 +41,8 @@ export const OutpatientSecondePage = (props: {
   setOutpatientData: Dispatch<SetStateAction<DoctorMenuRegister>>;
 }) => {
   const navigate = useNavigate();
-  const { queues, outpatientData, setOutpatientData } = props;
+  // const { queues, outpatientData, setOutpatientData } = props;
+  const { outpatientData, setOutpatientData } = props;
 
   const [queueArrays, setQueueArrays] = useState<QueueSchedule[]>([]);
   const [doctorInfo, setDoctorInfo] = useState<DoctorInfoSummary>();
@@ -138,7 +139,7 @@ export const OutpatientSecondePage = (props: {
       .toString()
       .padStart(2, "0")}-${date.toString().padStart(2, "0")}`;
     console.log("handle", reconstructedDateFromString);
-    const formattedDateISO = selectedDate.toISOString().split("T")[0];
+    // const formattedDateISO = selectedDate.toISOString().split("T")[0];
     setSelectedDate(reconstructedDateFromString);
     setDate(selectedDate);
 

@@ -10,8 +10,9 @@ import { RawatJalan } from "../components/types";
 const RawatJalanSchedule = () => {
   const [outpatients, setOutpatients] = useState<RawatJalan[]>([]);
   const [status, setStatus] = useState("pending");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
+  const [, setSearchQuery] = useState("");
+  const [, setFilter] = useState("");
 
   // const token = localStorage.getItem("token");
 

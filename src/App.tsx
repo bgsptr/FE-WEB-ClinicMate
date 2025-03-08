@@ -14,7 +14,7 @@ function App() {
   //   // };
   // }, []);
 
-  const inputChange = (e) => {
+  const inputChange = (e: any) => {
     setUsername(e.target.value);
   }
 
@@ -22,7 +22,7 @@ function App() {
     console.log(username)
   }, [username])
 
-  const click = (e) => {
+  const click = (e: any) => {
     e.preventDefault()
     const evtSrc = new EventSource(`http://localhost:8005/events?username=${username}`);
     evtSrc.onmessage = function (event) {

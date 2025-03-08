@@ -57,7 +57,7 @@ const RawatJalanRegister = () => {
 
   // const [menuLocalStorage, setMenuLocalStorage] = useState(localStorage.getItem("doctorMenu"));
   const getLocal = getEcryptedLocalStorage("doctorMenu");
-  const [storedValue, setStoredValue] = useState<{ doctorId: string, outpatientQueueDate: string } | null>(getLocal && JSON.parse(getLocal) || null);
+  const [storedValue,] = useState<{ doctorId: string, outpatientQueueDate: string } | null>(getLocal && JSON.parse(getLocal) || null);
 
   useEffect(() => {
     console.log(doctorMenu)

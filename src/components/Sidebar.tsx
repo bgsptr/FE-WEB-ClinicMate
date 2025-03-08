@@ -23,9 +23,10 @@ const Sidebar = () => {
     navigate("/chat");
   };
 
-  const { role, logout, setRole } = useAuth();
+  const { role, setRole }: any = useAuth();
 
-  const handleLogout = async (e: any) => {
+
+  const handleLogout = async () => {
     // await logout();
     try {
       await axios.post(
