@@ -5,6 +5,7 @@ import {
   // MouseEvent,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import Calendar from "react-calendar";
@@ -40,6 +41,8 @@ export const OutpatientSecondePage = (props: {
   outpatientData: DoctorMenuRegister;
   setOutpatientData: Dispatch<SetStateAction<DoctorMenuRegister>>;
 }) => {
+  const activeQueuesRef = useRef<Record<number, HTMLButtonElement | null>>({});
+
   const navigate = useNavigate();
   // const { queues, outpatientData, setOutpatientData } = props;
   const { outpatientData, setOutpatientData } = props;
@@ -52,7 +55,13 @@ export const OutpatientSecondePage = (props: {
   const { patientId, doctorId, outpatientQueueDate } = selectedDoc;
 
   const [selectedDate, setSelectedDate] = useState<string>(outpatientQueueDate);
-  const [date, setDate] = useState<Date>(new Date());
+  // const [date, setDate] = useState<Date>(new Date());
+
+  const [date, setDate] = useState<Date>(() => {
+    const queueDate = selectedDoc.outpatientQueueDate;
+    console.warn("state date: ", queueDate)
+    return queueDate ? new Date(queueDate) : new Date()
+  });
 
   const fetchSchedulePageTwo = async () => {
     if (!doctorId || !selectedDate) return;
@@ -75,7 +84,7 @@ export const OutpatientSecondePage = (props: {
   };
 
   useEffect(() => {
-    console.log(queueArrays);
+    console.log("content of data: ", queueArrays);
 
     fetchSchedulePageTwo();
   }, [selectedDate]);
@@ -121,7 +130,26 @@ export const OutpatientSecondePage = (props: {
     console.log(outpatientData);
   }, [outpatientData]);
 
+  const [activeQueueNo, setActiveQueueNo] = useState<number | null>(null);
+
   const handleOutpatientQueueNo = (e: any) => {
+    const queueNo = Number(e.target.value);
+    const newActiveButtonElement = activeQueuesRef.current[queueNo];
+
+    // Delete classlist in previous state
+    if (activeQueueNo !== null && activeQueuesRef.current[activeQueueNo]) {
+      const prevActiveButton = activeQueuesRef.current[activeQueueNo];
+      prevActiveButton.setAttribute("data-active", "false");
+      prevActiveButton.classList.remove("bg-blue-500", "text-white", "border-blue-500");
+    }
+
+    if (newActiveButtonElement) {
+      newActiveButtonElement.setAttribute("data-active", "true");
+      newActiveButtonElement.classList.add("bg-blue-500", "text-white", "border-blue-500");
+    }
+
+    setActiveQueueNo(queueNo);
+
     setOutpatientData((prev) => ({
       ...prev,
       queueNo: e.target.value,
@@ -237,18 +265,20 @@ export const OutpatientSecondePage = (props: {
           {/* List Waktu */}
           <div className="grid grid-cols-2 gap-3">
             {queueArrays.length > 0 ? (
-              queueArrays.map((queue, index) => (
+              queueArrays.map((queue) => (
                 <button
-                  key={index}
-                  id="queueNo"
+                  key={queue.queueNo}
+                  id={`queueNo-${queue.queueNo}`}
+                  ref={(element) => (activeQueuesRef.current[queue.queueNo] = element)}
                   onClick={handleOutpatientQueueNo}
-                  value={index + 1}
+                  value={queue.queueNo}
+                  disabled={!queue.availableStatus}
                   className={`py-3 text-center border rounded-lg shadow-sm text-gray-700 hover:bg-blue-500 hover:text-white transition 
-                  ${
-                    queue.availableStatus
-                      ? "hover:bg-blue-500 hover:text-white"
-                      : "opacity-50 cursor-not-allowed shadow-md"
-                  } `}
+                    ${
+                      queue.availableStatus
+                        ? "hover:bg-blue-500 hover:text-white active:border-blue-500"
+                        : "opacity-50 cursor-not-allowed shadow-md"
+                    } active:border-2`}
                 >
                   {queue.startTime}
                 </button>

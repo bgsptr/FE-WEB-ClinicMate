@@ -35,14 +35,14 @@ const Root = () => {
 
           <Route path="/register" element={<Register />} />
 
-          <Route
+          {/* <Route
             path="/patient"
             element={
               <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
                 <PatientList />
               </ProtectedRoutes>
             }
-          />
+          /> */}
 
           <Route
             path="/rawat_jalan"
@@ -65,7 +65,7 @@ const Root = () => {
           <Route
             path="/patient/register"
             element={
-              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+              <ProtectedRoutes allowedRoles={[Role.ADMIN, Role.PATIENT]}>
                 <PatientRegister />
               </ProtectedRoutes>
             }
@@ -80,13 +80,21 @@ const Root = () => {
             }
           />
 
+          <Route
+            path="/jadwal_praktik/:doctor_id"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <AddSchedule />
+              </ProtectedRoutes>
+            }
+          />
+
           {/* <Route path="/rawat_jalan" element={<RawatJalanSchedule />} /> */}
           {/* <Route path="/rawat_jalan/register" element={<RawatJalanRegister />} /> */}
 
           <Route path="/patient_detail" element={<PatientDetail />} />
           <Route path="/jadwal_praktik" element={<DoctorSchedule />} />
           {/* <Route path="/jadwal_praktik/list" element={<ScheduleList />} /> */}
-          <Route path="/jadwal_praktik/:doctor_id" element={<AddSchedule />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />

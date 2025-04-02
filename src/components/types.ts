@@ -12,6 +12,9 @@ export interface RawatJalan {
   queue_no: number;
   queue_status: string;
   id_queue: number;
+  rawat_jalan_date: string;
+  queue_start_time: string;
+  queue_end_time: string;
 }
 
 export interface Props {

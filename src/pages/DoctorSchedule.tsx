@@ -231,7 +231,7 @@ const DoctorSchedule = () => {
                       htmlFor="hari-praktik"
                       className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
                     >
-                      Hari Praktik
+                      Slot Pasien
                     </label>
                     <input
                       type="text"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { variables } from "../constants/variable";
 import axios from "axios";
@@ -6,6 +6,19 @@ import FilterSection from "../components/outpatient-schedule/FilterSection";
 import StatusTabs from "../components/outpatient-schedule/StatusTabs";
 import OutpatientTableRow from "../components/outpatient-schedule/OutpatientTableRow";
 import { RawatJalan } from "../components/types";
+
+export interface QueryOutpatientDto {
+  doctor_id: string,
+  date: string,
+  patient_name: string,
+}
+
+export interface QueryOutpatientAction {
+  type: string,
+  // attrName: keyof QueryOutpatientDto,
+  attrName: string,
+  value: string,
+}
 
 const RawatJalanSchedule = () => {
   const [outpatients, setOutpatients] = useState<RawatJalan[]>([]);
@@ -16,16 +29,40 @@ const RawatJalanSchedule = () => {
 
   // const token = localStorage.getItem("token");
 
+  const reducer = (state: QueryOutpatientDto, action: QueryOutpatientAction) => {
+    switch(action.type) {
+      case 'OUTPATIENT_FILTER':
+        return {
+          ...state,
+          [action.attrName]: action.value
+        }
+      default:
+        return state;
+    }
+  }
+
+  const queryInitState: QueryOutpatientDto = {
+    doctor_id: "",
+    date: "",
+    patient_name: "",
+  }
+
+  const [state, dispatch] = useReducer(reducer, queryInitState);
+
+  useEffect(() => {
+    console.log(state);
+  }, [state])
+
   useEffect(() => {
     const fetchOutpatients = async () => {
-      const url = `${variables.BASE_URL}/outpatients?status=${status}`;
+      const url = `${variables.BASE_URL}/outpatients?status=${status}&doctor_id=${state.doctor_id}&consult_date=${state.date}&keyword=${state.patient_name}`;
       try {
         const res = await axios.get(url, {
           headers: {
             "Content-Type": "application/json",
             // Authorization: `Bearer ${token}`,
           },
-          withCredentials: true
+          withCredentials: true,
         });
         setOutpatients(res.data);
       } catch (error) {
@@ -33,7 +70,7 @@ const RawatJalanSchedule = () => {
       }
     };
     fetchOutpatients();
-  }, [status]);
+  }, [status, state]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -67,7 +104,11 @@ const RawatJalanSchedule = () => {
           <h3 className="font-semibold">Registrasi</h3>
         </div>
 
-        <FilterSection onSearch={handleSearch} onFilterChange={handleFilterChange} />
+        <FilterSection
+          onSearch={handleSearch}
+          onFilterChange={handleFilterChange}
+          dispatch={dispatch}
+        />
         <StatusTabs status={status} setStatus={setStatus} />
 
         <div className="border-2"></div>
@@ -90,14 +131,20 @@ const RawatJalanSchedule = () => {
               <th className="px-9 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                 STATUS
               </th>
-              <th className="px-9 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                Action
-              </th>
+              {status === "pending" && (
+                <th className="px-9 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                  Action
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {outpatients.map((val) => (
-              <OutpatientTableRow key={val.id_rawat_jalan} data={val} />
+              <OutpatientTableRow
+                key={val.id_rawat_jalan}
+                data={val}
+                status={status}
+              />
             ))}
           </tbody>
         </table>

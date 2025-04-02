@@ -31,12 +31,12 @@ const Sidebar = () => {
     try {
       await axios.post(
         `${variables.BASE_URL}/users/logout`,
-        {}, // Empty body since no data is sent
+        {}, // Empty body
         {
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true, // Ensure cookies are included
+          withCredentials: true,
         }
       );
 
@@ -143,7 +143,7 @@ const Sidebar = () => {
                 </li>
               )}
 
-              {role === Role.ADMIN && (
+              {(role === Role.ADMIN || role === Role.PATIENT) && (
                 <li>
                   <a
                     className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
@@ -151,7 +151,15 @@ const Sidebar = () => {
                         ? "bg-gray-100 dark:bg-neutral-700"
                         : ""
                     }`}
-                    onClick={() => navigate("/patient")}
+                    onClick={() => {
+                      if (role === Role.PATIENT) {
+                        navigate("/patient/register");
+                      } else if (role === Role.ADMIN) {
+                        navigate("/patient");
+                      } else {
+                        navigate("/forbiiden");
+                      }
+                    }}
                   >
                     <svg
                       className="size-4"

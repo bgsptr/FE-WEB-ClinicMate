@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { variables } from "../../constants/variable";
 import axios from "axios";
 import { DoctorDropdown } from "../../pages/RawatJalanRegister";
+import { QueryOutpatientAction } from "../../pages/RawatJalanSchedule";
 
 interface FilterSectionProps {
   onSearch: (query: string) => void;
   onFilterChange: (filter: string) => void;
+  dispatch: Dispatch<QueryOutpatientAction>;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   onSearch,
   onFilterChange,
+  dispatch,
 }) => {
   const [token] = useState(localStorage.getItem("token"));
   const [doctorsDropdown, setDoctorsDropdown] = useState<
@@ -38,13 +41,23 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     fetchDoctors();
   }, []);
 
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   return (
     <div className="flex justify-between w-full">
       <div className="flex gap-7 w-full">
         <div className="w-[27.5%]">
           <select
+            name="doctor_id"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            onChange={(e) => onFilterChange(e.target.value)}
+            onChange={(e) => {
+              onFilterChange(e.target.value);
+              dispatch({
+                type: "OUTPATIENT_FILTER",
+                attrName: e.target.name,
+                value: e.target.value,
+              });
+            }}
           >
             <option value="" disabled selected>
               Cari Nama Dokter
@@ -54,24 +67,37 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             ))}
           </select>
         </div>
-        <div className="w-1/4">
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            onChange={(e) => onFilterChange(e.target.value)}
-          >
-            <option value="" disabled selected>
-              Semua Hari
-            </option>
-            <option value="male">Laki-laki</option>
-            <option value="female">Perempuan</option>
-          </select>
+        <div className="w-[30%]">
+          <input
+            name="date"
+            type={isHovered ? "date" : "text"}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onChange={(e) => {
+              dispatch({
+                type: "OUTPATIENT_FILTER",
+                attrName: e.target.name,
+                value: e.target.value,
+              });
+            }}
+            className="px-4 py-2 border rounded-md w-full"
+            placeholder="Filter tanggal konsultasi"
+          />
         </div>
-        <div className="w-1/4 relative">
+        <div className="w-[30%] relative">
           <input
             type="text"
+            name="patient_name"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="Cari Nama/No.Telp pasien"
-            onChange={(e) => onSearch(e.target.value)}
+            onChange={(e) => {
+              onSearch(e.target.value);
+              dispatch({
+                type: "OUTPATIENT_FILTER",
+                attrName: e.target.name,
+                value: e.target.value,
+              });
+            }}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"

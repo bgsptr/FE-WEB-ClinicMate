@@ -433,7 +433,7 @@ const RawatJalanRegister = () => {
                   />
                 </div>
 
-                <div className="w-1/2">
+                {/* <div className="w-1/2">
                   <label
                     htmlFor="jenis-kelamin"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -444,7 +444,7 @@ const RawatJalanRegister = () => {
                     type="input"
                     className="px-4 py-2 border rounded-md w-full"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </tbody>
