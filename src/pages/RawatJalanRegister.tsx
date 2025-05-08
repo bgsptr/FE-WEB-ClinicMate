@@ -22,6 +22,7 @@ import fetchData from "../utils/axios/fetchData";
 import { SearchWithAutocomplete } from "../components/SearchWithAutocomplete";
 import { OptionType } from "../components/outpatient-schedule/FilterSection";
 
+
 export interface PatientRegisterToOutpatient {
   id_patient: string;
   name: string;
