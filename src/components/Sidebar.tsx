@@ -25,7 +25,6 @@ const Sidebar = () => {
 
   const { role, setRole }: any = useAuth();
 
-
   const handleLogout = async () => {
     // await logout();
     try {
@@ -111,7 +110,7 @@ const Sidebar = () => {
                 </li>
               )}
 
-              {role === Role.ADMIN && (
+              {(role === Role.ADMIN || role === Role.PATIENT) && (
                 <li>
                   <a
                     className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
@@ -119,7 +118,14 @@ const Sidebar = () => {
                         ? "bg-gray-100 dark:bg-neutral-700"
                         : ""
                     }`}
-                    onClick={() => navigate("/rawat_jalan")}
+                    onClick={() => {
+                      if (role === Role.ADMIN) {
+                        navigate("/rawat_jalan");
+                      }
+                      if (role === Role.PATIENT) {
+                        navigate("/rawat_jalan/register");
+                      }
+                    }}
                   >
                     <svg
                       className="size-4"
@@ -157,7 +163,7 @@ const Sidebar = () => {
                       } else if (role === Role.ADMIN) {
                         navigate("/patient");
                       } else {
-                        navigate("/forbiiden");
+                        navigate("/forbidden");
                       }
                     }}
                   >
@@ -186,6 +192,45 @@ const Sidebar = () => {
                       <path d="m20.7 13.8 1-.4" />
                     </svg>
                     Pasien
+                  </a>
+                </li>
+              )}
+
+              {(role === Role.ADMIN) && (
+                <li>
+                  <a
+                    className={`cursor-pointer font-semibold flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 ${
+                      isActive("doctor")
+                        ? "bg-gray-100 dark:bg-neutral-700"
+                        : ""
+                    }`}
+                    onClick={() => navigate("/doctor")}
+                  >
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="18" cy="15" r="3" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M10 15H6a4 4 0 0 0-4 4v2" />
+                      <path d="m21.7 16.4-.9-.3" />
+                      <path d="m15.2 13.9-.9-.3" />
+                      <path d="m16.6 18.7.3-.9" />
+                      <path d="m19.1 12.2.3-.9" />
+                      <path d="m19.6 18.7-.4-1" />
+                      <path d="m16.8 12.3-.4-1" />
+                      <path d="m14.3 16.6 1-.4" />
+                      <path d="m20.7 13.8 1-.4" />
+                    </svg>
+                    Doctor
                   </a>
                 </li>
               )}

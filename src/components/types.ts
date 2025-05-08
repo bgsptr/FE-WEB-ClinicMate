@@ -45,3 +45,46 @@ export const Role: {
 export type Role =
   (typeof Role)[keyof typeof Role];
   
+export interface OutpatientTableRowProps {
+  data: RawatJalan;
+  status: string;
+}
+
+export interface VerificationOutpatientBody {
+  verify_status: boolean
+}
+
+export const VerificationStatus: {
+  ACCEPTED: 'ACCEPTED'
+  REJECTED: 'REJECTED'
+  // PENDING: 'PENDING'
+} = {
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  // PENDING: 'PENDING'
+}
+
+export type VerificationStatus = typeof VerificationStatus[keyof typeof VerificationStatus]
+
+
+export const Gender: {
+  MALE: 'MALE'
+  FEMALE: 'FEMALE'
+} = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+}
+
+export type Gender = typeof Gender[keyof typeof Gender]
+
+export const PaginationColor: {
+  PRIMARY: 'primary'
+  SECONDARY: 'secondary',
+  STANDARD: 'standard'
+} = {
+  PRIMARY: 'primary',
+  SECONDARY: 'secondary',
+  STANDARD: 'standard',
+}
+
+export type PaginationColor = typeof PaginationColor[keyof typeof PaginationColor]

@@ -1,9 +1,10 @@
-import { useEffect, useReducer, useState } from "react";
+import { ChangeEvent, useEffect, useReducer, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { variables } from "../constants/variable";
-// import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import PaginationComponent from "../components/PaginationComponent";
+import { PaginationColor } from "../components/types";
 
 export interface Patient {
   id_patient: string;
@@ -85,9 +86,27 @@ const PatientList = () => {
     console.log(state);
   }, [state]);
 
+  const [page, setPage] = useState(1);
+
+  const handlePageChange = (
+    e: ChangeEvent<HTMLSelectElement>,
+    value: number
+  ) => {
+    setPage(value);
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 0);
+  };
+
   useEffect(() => {
     const fetchPatients = async () => {
-      const url = `${variables.BASE_URL}/patients?keyword=${state.queryPatient.patient_name}&date=${state.queryPatient.date}`;
+      const url = `${variables.BASE_URL}/patients?keyword=${
+        state.queryPatient.patient_name
+      }&date=${state.queryPatient.date}&index=${page - 1}`;
       try {
         const res = await axios.get(url, {
           headers: {
@@ -108,16 +127,17 @@ const PatientList = () => {
       fetchPatients();
       dispatch({ type: "FIRST_LOAD", value: false });
     } else {
+      // debounce
       const filterTimeout = setTimeout(fetchPatients, 500);
 
       return () => {
         clearTimeout(filterTimeout);
       };
     }
-  }, [state]);
+  }, [state, page]);
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full font-poppins">
       <div className="w-[16%]">
         <Sidebar />
       </div>
@@ -285,6 +305,21 @@ const PatientList = () => {
                           </td>
                         </tr>
                       ))}
+
+                      <tr className="w-full">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td colSpan={2} className="py-3 px-2">
+                          <PaginationComponent
+                            color={PaginationColor.PRIMARY}
+                            countTotalPage={patients.length / 10 + 1}
+                            page={page}
+                            handlePageChange={handlePageChange}
+                          />
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>

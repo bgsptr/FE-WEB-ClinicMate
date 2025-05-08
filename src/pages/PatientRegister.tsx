@@ -1,11 +1,14 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { variables } from "../constants/variable";
 import { useAuth } from "../context/AuthContext";
 import { Role } from "../components/types";
 import { useNavigate } from "react-router-dom";
-// import Cookies from "js-cookie";
+import patientFormSchema from "../utils/validations/patientFormSchema";
+import { ZodError } from "zod";
+import ErrorInputMessage from "../components/ErrorInputMessage";
+import ModalComponent from "../components/ModalComponent";
 
 interface PatientRegister {
   full_name: string;
@@ -65,6 +68,9 @@ const PatientRegister = () => {
     });
   };
 
+  const [errorValidaton, setErrorValidation] = useState<any>();
+  const [errorBackend, setErrorBackend] = useState<string>("");
+
   const submitUpdateData = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -77,6 +83,8 @@ const PatientRegister = () => {
     const url = `${variables.BASE_URL}/patients`;
 
     try {
+      patientFormSchema.parse(patientData);
+
       await axios.post(url, JSON.stringify(patientData), {
         headers: {
           "Content-Type": "application/json",
@@ -95,8 +103,28 @@ const PatientRegister = () => {
         email: "",
         phone_number: "",
       });
-    } catch (error) {}
+      setErrorValidation(null);
+      setErrorBackend("");
+      setOpen(true);
+    } catch (error: any) {
+      console.log(error);
+      if (error instanceof ZodError) {
+        const errorMsg = new Map();
+        error.errors.map((err) => {
+          errorMsg.set(err.path.join(), err.message);
+        });
+        setErrorValidation(errorMsg);
+      } else if (error instanceof AxiosError) {
+        setErrorValidation(null);
+        setErrorBackend(error?.response?.data?.message);
+      }
+    } finally {
+    }
   };
+
+  useEffect(() => {
+    console.log(errorValidaton);
+  }, [errorValidaton]);
 
   useEffect(() => {
     if (!role && role !== Role.PATIENT) return;
@@ -169,11 +197,58 @@ const PatientRegister = () => {
   //   fetchEmail();
   // }, []);
 
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full font-poppins">
       <Sidebar />
       <div className="bg-gray-100 w-full px-[6rem] py-[2rem]">
-        <h1 className="font-medium text-sm mb-4">DATA DIRI</h1>
+        <ModalComponent open={open} handleClose={handleClose} />
+        {errorBackend ? (
+          <div
+            className="bg-red-50 border-s-4 border-red-500 p-4 dark:bg-red-800/30"
+            role="alert"
+            tabIndex={-1}
+            aria-labelledby="hs-bordered-red-style-label"
+          >
+            <div className="flex">
+              <div className="shrink-0">
+                {/* <!-- Icon --> */}
+                <span className="inline-flex justify-center items-center size-8 rounded-full border-4 border-red-100 bg-red-200 text-red-800 dark:border-red-900 dark:bg-red-800 dark:text-red-400">
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </span>
+                {/* <!-- End Icon --> */}
+              </div>
+              <div className="ms-3">
+                <h3
+                  id="hs-bordered-red-style-label"
+                  className="text-gray-800 font-semibold dark:text-white"
+                >
+                  Error!
+                </h3>
+                <p className="text-sm text-gray-700 dark:text-neutral-400">
+                  {errorBackend}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        <h1 className="font-medium text-sm mb-4 mt-2">DATA DIRI</h1>
         {role === Role.PATIENT && (
           <div className="flex gap-6 items-center">
             <div className="rounded-full border-2 w-[4rem] h-[4rem] bg-[#B9E5E8]"></div>
@@ -201,11 +276,14 @@ const PatientRegister = () => {
               name="full_name"
               value={patientData.full_name}
               onChange={handleChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`${
+                errorValidaton?.get("full_name") && "border-red-500"
+              } border g-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
               placeholder="Nama Lengkap"
               required
               readOnly={readOnlyInput}
             />
+            <ErrorInputMessage name="full_name" errors={errorValidaton} />
           </div>
 
           <div className="mb-5 flex gap-7 w-full">
@@ -222,11 +300,14 @@ const PatientRegister = () => {
                 name="email"
                 value={patientData.email}
                 onChange={handleChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                className={`${
+                  errorValidaton?.get("email") && "border-red-500"
+                } border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
                 placeholder="patient@gmail.com"
                 readOnly={readOnlyInput}
                 required
               />
+              <ErrorInputMessage name="email" errors={errorValidaton} />
             </div>
 
             <div className="w-1/2">
@@ -241,7 +322,9 @@ const PatientRegister = () => {
                 name="gender"
                 value={patientData.gender}
                 onChange={handleChange}
-                className={`border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                className={`${
+                  errorValidaton?.get("gender") && "border-red-500"
+                } border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
                   readOnlyInput &&
                   "pointer-events-none bg-white cursor-not-allowed"
                 }`}
@@ -253,6 +336,7 @@ const PatientRegister = () => {
                 <option value="MALE">Laki-laki</option>
                 <option value="FEMALE">Perempuan</option>
               </select>
+              <ErrorInputMessage name="gender" errors={errorValidaton} />
             </div>
           </div>
 
@@ -271,11 +355,14 @@ const PatientRegister = () => {
                 name="birth_place"
                 value={patientData.birth_place}
                 onChange={handleChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                className={`${
+                  errorValidaton?.get("birth_place") && "border-red-500"
+                } bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
                 placeholder="Tempat Lahir"
                 required
                 readOnly={readOnlyInput}
               />
+              <ErrorInputMessage name="birth_place" errors={errorValidaton} />
             </div>
 
             <div className="w-1/2">
@@ -295,9 +382,12 @@ const PatientRegister = () => {
                     : ""
                 }
                 onChange={handleChange}
-                className="px-4 py-2 border rounded-md w-full"
+                className={`${
+                  errorValidaton?.get("birth_date") && "border-red-500"
+                } border px-4 py-2 border rounded-md w-full`}
                 readOnly={readOnlyInput}
               />
+              <ErrorInputMessage name="birth_date" errors={errorValidaton} />
             </div>
           </div>
 
@@ -315,11 +405,14 @@ const PatientRegister = () => {
                 name="phone_number"
                 value={patientData.phone_number}
                 onChange={handleChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                className={`${
+                  errorValidaton?.get("phone_number") && "border-red-500"
+                } border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
                 placeholder="e.g. 628112345678"
                 required
                 readOnly={readOnlyInput}
               />
+              <ErrorInputMessage name="phone_number" errors={errorValidaton} />
             </div>
           </div>
 
@@ -340,10 +433,13 @@ const PatientRegister = () => {
               name="domicile"
               value={patientData.domicile}
               onChange={handleChange}
-              className="mb-8 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              className={`${
+                errorValidaton?.get("domicile") && "border-red-500"
+              } border resize-none mb-4 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500`}
               placeholder="Masukkan Alamat Tempat Tinggal"
               readOnly={readOnlyInput}
             ></textarea>
+            <ErrorInputMessage name="domicile" errors={errorValidaton} />
           </div>
 
           {/* Submit Button */}
@@ -351,7 +447,7 @@ const PatientRegister = () => {
             <button
               onClick={() => navigate("../patient")}
               type="submit"
-              className="mt-8 mr-3 text-[#478CCF] border-1 bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="mt-8 mr-3 text-[#478CCF] border-1 bg-white hover:bg-[#ecfdf5] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Kembali
             </button>

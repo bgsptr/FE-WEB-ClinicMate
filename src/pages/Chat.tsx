@@ -105,7 +105,7 @@ const Chat = () => {
   }, [messages]);
 
   return (
-    <div>
+    <div className="font-poppins">
       <Sidebar />
       <ul className="space-y-5 max-h-[400px] overflow-y-auto">
         {messages.map((message) => {

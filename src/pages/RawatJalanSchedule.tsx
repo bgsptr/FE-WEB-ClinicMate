@@ -5,19 +5,20 @@ import axios from "axios";
 import FilterSection from "../components/outpatient-schedule/FilterSection";
 import StatusTabs from "../components/outpatient-schedule/StatusTabs";
 import OutpatientTableRow from "../components/outpatient-schedule/OutpatientTableRow";
-import { RawatJalan } from "../components/types";
+import { PaginationColor, RawatJalan } from "../components/types";
+// import PaginationComponent from "../components/PaginationComponent";
 
 export interface QueryOutpatientDto {
-  doctor_id: string,
-  date: string,
-  patient_name: string,
+  doctor_id: string;
+  date: string;
+  patient_name: string;
 }
 
 export interface QueryOutpatientAction {
-  type: string,
+  type: string;
   // attrName: keyof QueryOutpatientDto,
-  attrName: string,
-  value: string,
+  attrName: string;
+  value: string;
 }
 
 const RawatJalanSchedule = () => {
@@ -29,29 +30,32 @@ const RawatJalanSchedule = () => {
 
   // const token = localStorage.getItem("token");
 
-  const reducer = (state: QueryOutpatientDto, action: QueryOutpatientAction) => {
-    switch(action.type) {
-      case 'OUTPATIENT_FILTER':
+  const reducer = (
+    state: QueryOutpatientDto,
+    action: QueryOutpatientAction
+  ) => {
+    switch (action.type) {
+      case "OUTPATIENT_FILTER":
         return {
           ...state,
-          [action.attrName]: action.value
-        }
+          [action.attrName]: action.value,
+        };
       default:
         return state;
     }
-  }
+  };
 
   const queryInitState: QueryOutpatientDto = {
     doctor_id: "",
     date: "",
     patient_name: "",
-  }
+  };
 
   const [state, dispatch] = useReducer(reducer, queryInitState);
 
   useEffect(() => {
     console.log(state);
-  }, [state])
+  }, [state]);
 
   useEffect(() => {
     const fetchOutpatients = async () => {
@@ -82,8 +86,14 @@ const RawatJalanSchedule = () => {
     // Add filter logic here
   };
 
+  // const [page, setPage] = useState(1);
+
+  // const handlePageChange = (e: any, value: number) => {
+  //   setPage(value);
+  // }
+
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full font-poppins">
       <Sidebar />
       <div className="bg-gray-100 w-full px-[6rem] py-[2rem] flex flex-col gap-5">
         <div className="flex items-center gap-4">
@@ -146,6 +156,21 @@ const RawatJalanSchedule = () => {
                 status={status}
               />
             ))}
+
+            {/* <tr className="w-full">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td colSpan={2} className="py-3 px-2">
+                <PaginationComponent
+                  color={PaginationColor.PRIMARY}
+                  countTotalPage={outpatients.length / 10 + 1}
+                  page={page}
+                  handlePageChange={handlePageChange}
+                />
+              </td>
+            </tr> */}
           </tbody>
         </table>
       </div>

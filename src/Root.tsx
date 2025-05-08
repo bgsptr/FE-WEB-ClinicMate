@@ -15,6 +15,8 @@ import Chat from "./pages/Chat";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoutes from "./components/ProtectedRoute";
 import { Role } from "./components/types";
+import { Doctor } from "./pages/Doctor";
+import { Home } from "./pages/Home";
 
 const Root = () => {
   return (
@@ -29,6 +31,15 @@ const Root = () => {
             element={
               <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
                 <PatientList />
+              </ProtectedRoutes>
+            }
+          />
+
+          <Route
+            path="/doctor"
+            element={
+              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+                <Doctor />
               </ProtectedRoutes>
             }
           />
@@ -56,7 +67,7 @@ const Root = () => {
           <Route
             path="/rawat_jalan/register"
             element={
-              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+              <ProtectedRoutes allowedRoles={[Role.ADMIN, Role.PATIENT]}>
                 <RawatJalanRegister />
               </ProtectedRoutes>
             }
@@ -74,7 +85,7 @@ const Root = () => {
           <Route
             path="/jadwal_praktik/list"
             element={
-              <ProtectedRoutes allowedRoles={[Role.ADMIN]}>
+              <ProtectedRoutes allowedRoles={[Role.ADMIN, Role.PATIENT]}>
                 <ScheduleList />
               </ProtectedRoutes>
             }
@@ -98,6 +109,7 @@ const Root = () => {
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/" element={<Home />} />
         </Routes>
       </AuthProvider>
     </Suspense>

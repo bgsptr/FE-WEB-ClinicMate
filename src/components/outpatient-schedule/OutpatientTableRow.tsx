@@ -1,15 +1,36 @@
-import React from "react";
-import { RawatJalan } from "../types";
-
-interface OutpatientTableRowProps {
-  data: RawatJalan;
-  status: string;
-}
+import React, { MouseEvent } from "react";
+import { OutpatientTableRowProps, VerificationOutpatientBody, VerificationStatus } from "../types";
+import patchData from "../../utils/axios/patchData";
+import { variables } from "../../constants/variable";
 
 const OutpatientTableRow: React.FC<OutpatientTableRowProps> = ({
   data,
   status,
 }) => {
+
+  const getVerificationBody = (action: VerificationStatus): VerificationOutpatientBody => ({
+    verify_status: action === VerificationStatus.ACCEPTED,
+  });
+
+  const updateVerifyStatus = async (e: MouseEvent<HTMLButtonElement>) => {
+    // console.log(e.currentTarget.name);
+    const action = e.currentTarget.name.toUpperCase() as VerificationStatus;
+    
+    if (![VerificationStatus.ACCEPTED, VerificationStatus.REJECTED].includes(action)) {
+      console.warn('Unknown button action:', action);
+      return;
+    }
+
+    try {
+      const url = `${variables.BASE_URL}/outpatients/${data.id_rawat_jalan}`;
+      const body = getVerificationBody(action);
+      await patchData(url, body);
+    } catch (err) {
+      console.error('Verification update failed:', err);
+
+    }
+  };
+
   return (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
@@ -37,7 +58,8 @@ const OutpatientTableRow: React.FC<OutpatientTableRowProps> = ({
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
         <h1 className="font-semibold">{data.patient_name}</h1>
-        <p className="font-normal">NRMF002009</p>
+        {/* <p className="font-normal">NRMF002009</p> */}
+        <p className="font-normal">{data.id_patient}</p>
         <p className="font-normal">Reguler</p>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
@@ -73,7 +95,7 @@ const OutpatientTableRow: React.FC<OutpatientTableRowProps> = ({
       <td className="flex justify-center text-center gap-3 h-full py-8">
         {status === "pending" && (
           <>
-            <button>
+            <button onClick={updateVerifyStatus} name="accepted">
               <svg
                 width="24"
                 height="24"
@@ -91,7 +113,7 @@ const OutpatientTableRow: React.FC<OutpatientTableRowProps> = ({
                 />
               </svg>
             </button>
-            <button>
+            <button onClick={updateVerifyStatus} name="rejected">
               <svg
                 width="24"
                 height="24"
